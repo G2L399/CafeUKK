@@ -55,7 +55,8 @@ model Detail_Transaksi {
   id_detail_transaksi Int       @id @default(autoincrement())
   id_transaksi        Int
   id_menu             Int
-  harga               Int
+  jumlah              Int
+  total_harga         Int
   Transaksi           Transaksi @relation(fields: [id_transaksi], references: [id_transaksi])
   Menu                Menu      @relation(fields: [id_menu], references: [id_menu])
 }
