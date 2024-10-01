@@ -75,7 +75,7 @@ const MejaTable = () => {
                 </TableCell>
                 <TableCell
                   style={{
-                    width: "500px", // Fixed width
+                    width: "500px",
                     wordBreak: "break-all",
                     whiteSpace: "normal",
                   }}

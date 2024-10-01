@@ -14,40 +14,41 @@ generator client {
 }
 
 model User {
-  id_user     Int      @id @default(autoincrement())
-  nama_user   String
-  role        Role
-  username    String
-  password    String
-  Transaksi   Transaksi[]
+  id_user   Int         @id @default(autoincrement())
+  nama_user String
+  role      Role
+  username  String
+  password  String
+  Transaksi Transaksi[]
 }
 
 model Menu {
-  id_menu     Int      @id @default(autoincrement())
-  nama_menu   String
-  jenis       Jenis
-  deskripsi   String?
-  gambar      String?  @db.LongText
-  harga       Int
-  date_added  DateTime          @default(now())
+  id_menu          Int                @id @default(autoincrement())
+  nama_menu        String
+  jenis            Jenis
+  deskripsi        String?
+  gambar           String?            @db.LongText
+  harga            Int
+  date_added       DateTime           @default(now())
   Detail_Transaksi Detail_Transaksi[]
 }
 
 model Meja {
-  id_meja     Int      @id @default(autoincrement())
-  nomor_meja  String
-  Transaksi   Transaksi[]
+  id_meja    Int         @id @default(autoincrement())
+  nomor_meja String
+  Transaksi  Transaksi[]
 }
 
 model Transaksi {
-  id_transaksi    Int               @id @default(autoincrement())
-  tgl_transaksi   DateTime          @default(now())
-  id_user         Int
-  id_meja         Int
-  nama_pelanggan  String
-  status          Status
-  User            User              @relation(fields: [id_user], references: [id_user])
-  Meja            Meja              @relation(fields: [id_meja], references: [id_meja])
+  id_transaksi   Int      @id @default(autoincrement())
+  tgl_transaksi  DateTime @default(now())
+  id_user        Int
+  id_meja        Int
+  nama_pelanggan String
+  status         Status
+  total_harga    Int 
+  User             User               @relation(fields: [id_user], references: [id_user])
+  Meja             Meja               @relation(fields: [id_meja], references: [id_meja])
   Detail_Transaksi Detail_Transaksi[]
 }
 
@@ -63,7 +64,7 @@ model Detail_Transaksi {
 
 enum Role {
   admin
-  Cashier
+  cashier
   manajer
 }
 

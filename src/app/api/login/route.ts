@@ -6,6 +6,8 @@ const JWT_SECRET = process.env.JWT_SECRET; // Store this in environment variable
 
 export async function POST(req: NextRequest) {
   const { username, password } = await req.json();
+  console.log("Username:", username, "Password:", password);
+  
   if (!JWT_SECRET) {
     return NextResponse.json(
       { error: "JWT Secret is not defined in environment variables" },

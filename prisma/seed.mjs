@@ -15,7 +15,7 @@ async function main() {
   const user2 = await prisma.user.create({
     data: {
       nama_user: "Cashier",
-      role: "Cashier",
+      role: "cashier",
       username: "Cashier",
       password: "$2a$10$kEwhxz9Ar.KCXOaMCFtTy./FM8PtaxoD5K1OyGx81O2P6pYPseYam",
     },
