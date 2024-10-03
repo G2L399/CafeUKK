@@ -3,12 +3,15 @@ import { useState } from "react";
 import { Input, Button, Card, Spacer } from "@nextui-org/react";
 import axios from "axios";
 import Cookies from 'js-cookie';
-
+import { EyeIcon,EyeOff } from "lucide-react";
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // New state for error message
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,11 +68,21 @@ const LoginPage = () => {
           label="Password"
           placeholder="Enter your password"
           name="password"
-          type="password"
+          type={isVisible ? "text" : "password"}
           value={formData.password}
           onChange={handleChange}
           required
           fullWidth
+          endContent={
+            <button className="focus:outline-none" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
+              {isVisible ? (
+                <EyeOff className="text-2xl text-default-400 pointer-events-none" />
+              ) : (
+                <EyeIcon className="text-2xl text-default-400 pointer-events-none" />
+              )}
+            </button>
+          }
+          
         />
         <Spacer y={1.5} />
         <Button type="submit" color="primary" fullWidth>

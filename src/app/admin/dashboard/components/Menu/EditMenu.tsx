@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useState } from "react";
 import {
   Modal,
@@ -11,15 +13,24 @@ import {
   useDisclosure,
   Select,
   SelectItem,
+  Image,
 } from "@nextui-org/react";
 import axios from "axios";
-
+interface Menu {
+  id_menu: number;
+  nama_menu: string;
+  jenis: "Food" | "Beverage";
+  deskripsi: string;
+  gambar: string | null;
+  harga: number;
+  date_added: string | Date;
+}
 export default function EditMenu({
   refreshMenus,
   menu,
 }: {
   refreshMenus: () => void;
-  menu: any;
+  menu: Menu;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [formData, setFormData] = useState({
@@ -46,8 +57,8 @@ export default function EditMenu({
   ); // To store image Base64 string
 
   // Handle image file selection and conversion to Base64
-  const handleFileChange = async (e: any) => {
-    const file = e.target.files[0];
+  const handleFileChange = async (e:  React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     console.log(imagePreview);
 
     if (file) {
@@ -91,7 +102,6 @@ export default function EditMenu({
       console.error("Failed to edit menu:", error);
     }
   };
-
   return (
     <>
       <Button
@@ -103,7 +113,7 @@ export default function EditMenu({
         size="lg"
         onPress={onOpen}
       >
-        Edit {menu.nama_menu}
+        Edit Menu Button
       </Button>
       <Modal
         isOpen={isOpen}
@@ -116,7 +126,7 @@ export default function EditMenu({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Edit {menu.nama_menu}
+                Edit Menu Button
               </ModalHeader>
               <ModalBody>
                 <div className="flex gap-4">
@@ -130,12 +140,13 @@ export default function EditMenu({
                     {imagePreview && (
                       <>
                         <Spacer y={1} />
-                        <img
+                        <Image
                           src={imagePreview}
                           alt="Image preview"
+                          width={0}
+                          height={0}
+                          className="!w-full"
                           style={{
-                            width: "100%",
-                            maxHeight: "300px",
                             objectFit: "contain",
                           }}
                         />

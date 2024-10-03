@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import jwt from "jsonwebtoken";
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
   console.log("indian button");
-  const { cart, customerName, idmeja, total_harga } = await req.json();
+
+  const body = await req.json();
+
+  const { customerName } = body;
+  console.log(customerName);
+
+  const { total_harga } = body;
+  console.log(total_harga);
+
+  const { cart } = body;
+  console.log(cart);
+
+  const { idmeja } = body;
+  console.log(idmeja);
 
   // Validate the request body
   if (!cart || !customerName || !idmeja || !total_harga) {
@@ -21,12 +33,13 @@ export async function POST(req: NextRequest) {
   let userId;
   if (token) {
     try {
-      const decoded = jwt.decode(token, JWT_SECRET); // Replace with your JWT secret
-
-      userId = decoded?.user.id_user; // Extract id_user from the decoded token
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET as Secret
+      ) as JwtPayload;
+      userId = decoded.user.id_user; // Extract id_user from the decoded token
     } catch (error) {
       console.error("Error decoding token:", error);
-
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
   } else {
@@ -49,7 +62,6 @@ export async function POST(req: NextRequest) {
   await Promise.all(
     cart.map((item: any) => {
       console.log(item.total_harga);
-
       return prisma.detail_Transaksi.create({
         data: {
           id_transaksi: transaction.id_transaksi,

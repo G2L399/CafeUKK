@@ -125,8 +125,9 @@ import {
   useDisclosure,
   Spacer,
   Pagination,
+  Spinner,
 } from "@nextui-org/react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import AddMenu from "./AddMenu";
@@ -134,10 +135,11 @@ import EditMenu from "./EditMenu";
 interface Food {
   id_menu: number;
   nama_menu: string;
-  jenis: string;
-  deskripsi?: string;
-  gambar?: string;
+  jenis: "Food" | "Beverage";
+  deskripsi: string;
+  gambar: string;
   harga: number;
+  date_added: string | Date;
 }
 
 export default function FoodTable() {
@@ -145,6 +147,7 @@ export default function FoodTable() {
   const [loading, setLoading] = useState(true);
   const [focusedImage, setFocusedImage] = useState<string | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [accessDenied, setAccessDenied] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -162,6 +165,13 @@ export default function FoodTable() {
       setFoods(response.data.Menu);
     } catch (error) {
       console.error("Failed to fetch foods:", error);
+      if (error instanceof AxiosError) {
+        if (error.response?.data.redirectUrl) {
+          setAccessDenied(true);
+          console.log(error.response.data.redirectUrl);
+          window.location.href = "/" + error.response?.data.redirectUrl;
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -197,140 +207,150 @@ export default function FoodTable() {
     }).format(value);
   }
   return (
-    <div className="container p-4">
-      {/* Pagination Controls */}
-      <div className="flex justify-center mb-4">
-        <Pagination
-          total={Math.ceil(foods.length / itemsPerPage)}
-          initialPage={currentPage}
-          onChange={(page) => setCurrentPage(page)}
-          page={currentPage}
-          size={"lg"}
-          showControls={true}
-          loop={true}
-          isCompact={true}
-        />
-      </div>
-      <Table aria-label="Food Menu">
-        <TableHeader className="text-2xl text-bold">
-          <TableColumn aria-label="No">NO</TableColumn>
-          <TableColumn aria-label="Image">IMAGE</TableColumn>
-          <TableColumn aria-label="Name">NAME</TableColumn>
-          <TableColumn aria-label="Type">TYPE</TableColumn>
-          <TableColumn aria-label="Description">DESCRIPTION</TableColumn>
-          <TableColumn aria-label="Price">PRICE</TableColumn>
-          <TableColumn aria-label="Actions">ACTIONS</TableColumn>
-        </TableHeader>
-        <TableBody>
-          {loading ? (
-            <TableRow>
-              <TableCell>Loading...</TableCell>
-              <TableCell>Loading...</TableCell>
-              <TableCell>Loading...</TableCell>
-              <TableCell>Loading...</TableCell>
-              <TableCell>Loading...</TableCell>
-              <TableCell>Loading...</TableCell>
-              <TableCell>Loading...</TableCell>
-            </TableRow>
-          ) : (
-            currentFoods.map((food) => (
-              <TableRow key={food.id_menu}>
-                <TableCell className="text-xl">
-                  {currentFoods.indexOf(food) + 1}
-                </TableCell>
-                <TableCell className="text-xl">
-                  <div
-                    className=" relative w-44 h-44 overflow-hidden rounded-lg transition-transform duration-200 hover:scale-110"
-                    style={{
-                      transitionTimingFunction:
-                        "cubic-bezier(0.33, 1.52, 0.6, 1)",
-                    }}
-                  >
-                    {food.gambar ? (
-                      <img
-                        src={renderImage(food.gambar) || "/placeholder.svg"}
-                        alt={food.nama_menu}
-                        className="cursor-pointer flex items-center justify-center w-full h-full object-contain"
-                        onClick={() =>
-                          handleImageClick(renderImage(food.gambar) || "")
-                        }
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
-                        No Image
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-xl">{food.nama_menu}</TableCell>
-                <TableCell className="text-xl">{food.jenis}</TableCell>
-                <TableCell className="text-xl w-72">
-                  {food.deskripsi || "N/A"}
-                </TableCell>
-                <TableCell className="text-xl">
-                  {formatToRupiah(food.harga)}
-                </TableCell>
-                <TableCell>
-                  <EditMenu refreshMenus={refreshMenu} menu={food} />
-                  <Spacer y={5} />
-                  <Button
-                    className="text-lg hover:scale-110"
-                    style={{
-                      transitionTimingFunction:
-                        "cubic-bezier(0.33, 1.52, 0.6, 1)",
-                    }}
-                    color="danger"
-                    size="lg"
-                    onClick={() => handleDelete(food.id_menu)}
-                  >
-                    Delete {food.nama_menu}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+    <>
+      {accessDenied ? (
+        <div>An Error Occurred: Either Server Side or Access Denied</div>
+      ) : (
+        <div className="container p-4">
+          {/* Pagination Controls */}
+          <div className="flex justify-center mb-4">
+            <Pagination
+              total={Math.ceil(foods.length / itemsPerPage)}
+              initialPage={currentPage}
+              onChange={(page) => setCurrentPage(page)}
+              page={currentPage}
+              size={"lg"}
+              showControls={true}
+              loop={true}
+              isCompact={true}
+            />
+          </div>
+          <Table aria-label="Food Menu">
+            <TableHeader className="text-2xl text-bold">
+              <TableColumn aria-label="No">NO</TableColumn>
+              <TableColumn aria-label="Image">IMAGE</TableColumn>
+              <TableColumn aria-label="Name">NAME</TableColumn>
+              <TableColumn aria-label="Type">TYPE</TableColumn>
+              <TableColumn aria-label="Description">DESCRIPTION</TableColumn>
+              <TableColumn aria-label="Price">PRICE</TableColumn>
+              <TableColumn aria-label="Actions">ACTIONS</TableColumn>
+            </TableHeader>
+            <TableBody
+              emptyContent="No rows to display."
+              loadingContent={
+                <div>
+                  <Spinner aria-label="loading" />
+                  <div>Loading...</div>
+                </div>
+              }
+              loadingState={loading ? "loading" : "idle"}
+            >
+              {currentFoods.map((food) => (
+                <TableRow key={food.id_menu}>
+                  <TableCell className="text-xl">
+                    {currentFoods.indexOf(food) + 1}
+                  </TableCell>
+                  <TableCell className="text-xl">
+                    <div
+                      className=" relative w-44 h-44 overflow-hidden rounded-lg transition-transform duration-200 hover:scale-110"
+                      style={{
+                        transitionTimingFunction:
+                          "cubic-bezier(0.33, 1.52, 0.6, 1)",
+                      }}
+                    >
+                      {food.gambar ? (
+                        <Image
+                          src={renderImage(food.gambar) || "/placeholder.svg"}
+                          alt={food.nama_menu}
+                          className="cursor-pointer flex items-center justify-center w-full h-full object-contain"
+                          onClick={() =>
+                            handleImageClick(renderImage(food.gambar) || "")
+                          }
+                          width={200}
+                          height={200}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+                          No Image
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xl">{food.nama_menu}</TableCell>
+                  <TableCell className="text-xl">{food.jenis}</TableCell>
+                  <TableCell className="text-xl w-72">
+                    {food.deskripsi || "N/A"}
+                  </TableCell>
+                  <TableCell className="text-xl">
+                    {formatToRupiah(food.harga)}
+                  </TableCell>
+                  <TableCell>
+                    <EditMenu refreshMenus={refreshMenu} menu={food} />
+                    <Spacer y={5} />
+                    <Button
+                      className="text-lg hover:scale-110"
+                      style={{
+                        transitionTimingFunction:
+                          "cubic-bezier(0.33, 1.52, 0.6, 1)",
+                      }}
+                      color="danger"
+                      size="lg"
+                      onClick={() => handleDelete(food.id_menu)}
+                    >
+                      Delete Menu Button
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        size="xl"
-        isDismissable={false}
-        isKeyboardDismissDisabled={true}
-      >
-        <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">Food Image</ModalHeader>
-          <ModalBody>
-            {focusedImage && (
-              <Image
-                src={focusedImage}
-                alt="Focused food image"
-                width={800}
-                height={600}
-                layout="responsive"
-                objectFit="contain"
+          <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            size="xl"
+            isDismissable={false}
+            isKeyboardDismissDisabled={true}
+            backdrop="blur"
+          >
+            <ModalContent>
+              <ModalHeader className="flex flex-col gap-1">
+                Food Image
+              </ModalHeader>
+              <ModalBody>
+                {focusedImage && (
+                  <Image
+                    src={focusedImage}
+                    alt="Focused food image"
+                    width={800}
+                    height={600}
+                    layout="responsive"
+                    objectFit="contain"
+                  />
+                )}
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+
+          <Spacer y={5} />
+          <div className="flex justify-between">
+            <AddMenu refreshMenus={refreshMenu} />
+            {/* Pagination Controls */}
+            <div className="flex justify-center mb-4">
+              <Pagination
+                total={Math.ceil(foods.length / itemsPerPage)}
+                initialPage={currentPage}
+                onChange={(page) => setCurrentPage(page)}
+                page={currentPage}
+                size={"lg"}
+                showControls={true}
+                loop={true}
+                isCompact={true}
               />
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      <Spacer y={5} />
-      <AddMenu refreshMenus={refreshMenu} />
-      {/* Pagination Controls */}
-      <div className="flex justify-center mb-4">
-        <Pagination
-          total={Math.ceil(foods.length / itemsPerPage)}
-          initialPage={currentPage}
-          onChange={(page) => setCurrentPage(page)}
-          page={currentPage}
-          size={"lg"}
-          showControls={true}
-          loop={true}
-          isCompact={true}
-        />
-      </div>
-    </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

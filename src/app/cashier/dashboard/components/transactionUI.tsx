@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios, { AxiosError } from "axios";
 import {
   Button,
@@ -8,20 +8,30 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
-  Image,
   Input,
+  Image,
   Select,
   SelectItem,
   Spacer,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Spinner,
+  Pagination,
+  SortDescriptor,
 } from "@nextui-org/react";
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, Search, X } from "lucide-react";
+import React from "react";
 
 interface Menu {
   id_menu: number;
   nama_menu: string;
   jenis: "Food" | "Beverage";
   deskripsi: string;
-  gambar?: string | null;
+  gambar?: string;
   harga: number;
   date_added?: string | Date;
 }
@@ -44,16 +54,27 @@ export default function TransactionUI() {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [mejas, setmejas] = useState<Meja[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [searchQuery, setSearchQuery] = useState("");
   const [CartQuery, setCartQuery] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [idmeja, setIdmeja] = useState<number>(0);
+  const [filterType, setFilterType] = useState<"All" | "Food" | "Beverage">(
+    "All"
+  );
+
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [loading, setLoading] = useState(true);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "nama_menu",
+    direction: "ascending",
+  });
   const filteredMenus = menus.filter(
     (menu) =>
-      menu.nama_menu.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      menu.deskripsi.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      menu.jenis.toLowerCase().includes(searchQuery.toLowerCase())
+      (filterType === "All" || menu.jenis === filterType) &&
+      (menu.nama_menu.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        menu.deskripsi.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        menu.jenis.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const filteredCart = cart.filter(
@@ -62,6 +83,10 @@ export default function TransactionUI() {
       item.deskripsi.toLowerCase().includes(CartQuery.toLowerCase()) ||
       item.jenis.toLowerCase().includes(CartQuery.toLowerCase())
   );
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  };
   const fetchMeja = async () => {
     try {
       const response = await axios.get("/api/cashier/transaction/getMeja");
@@ -85,11 +110,25 @@ export default function TransactionUI() {
       localStorage.setItem("cart", JSON.stringify(cart));
     }
   }, [cart]);
+  const sortedMenu = useMemo(() => {
+    return [...filteredMenus].sort((a, b) => {
+      const first = a[sortDescriptor.column as keyof Menu];
+      const second = b[sortDescriptor.column as keyof Menu];
+      if (first === undefined && second === undefined) return 0;
+      if (first === undefined) return 1; // Treat undefined as greater than any defined value
+      if (second === undefined) return -1; // Treat defined values as less than undefined
 
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [filteredMenus, sortDescriptor]);
   const fetchMenus = async () => {
     try {
-      const response = await axios.get("/api/cashier/transaction/getMenu");
-      setMenus(response.data.Menu);
+      setLoading(true);
+      await axios
+        .get("/api/cashier/transaction/getMenu")
+        .then((response) => setMenus(response.data.Menu));
       console.log(menus);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -104,6 +143,8 @@ export default function TransactionUI() {
       } else {
         console.error("Unexpected error:", error);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -168,37 +209,43 @@ export default function TransactionUI() {
     );
   };
 
-  const sortMenus = () => {
-    const sorted = [...menus].sort((a, b) => {
-      const dateA = new Date(a.date_added ?? "").getTime();
-      const dateB = new Date(b.date_added ?? "").getTime();
-      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-    });
-    setMenus(sorted);
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
+  const submitTransaction = async (event: React.FormEvent) => {
+    event.preventDefault(); // Prevent page reload
 
-  const submitTransaction = async () => {
+    const total_harga: number = cart.reduce(
+      (sum, item) => sum + item.total_harga,
+      0
+    );
     try {
-      const total_harga: number = cart.reduce(
-        (sum, item) => sum + item.total_harga,
-        0
-      );
-      const response = await axios.post("/api/cashier/transaction/submit", {
-        cart,
-        customerName,
-        idmeja,
-        total_harga,
-      });
-      console.log("Response from server:", response.data);
-      
-    } catch (error) {
-      console.error("Error submitting transaction:", error);
-      alert("Error submitting transaction. Please try again.");
-    } finally {
-      setCart([]);
-      alert("Transaction submitted successfully!");
+      await axios
+        .post(
+          "/api/cashier/transaction/submit",
+
+          { cart, customerName, idmeja, total_harga }
+        )
+        .finally(() => {
+          setCart([]);
+          alert("Transaction submitted successfully!");
+        });
+
       localStorage.removeItem("cart");
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          // Server responded with a status other than 2xx
+          console.error("Error response:", error.response.data);
+        } else if (error.request) {
+          // Request was made but no response was received
+          console.error("No response received:", error.request);
+        } else {
+          // Something else happened
+          console.error("Error setting up request:", error.message);
+        }
+      } else {
+        // Handle non-Axios errors here
+        console.error("Unknown error:", error);
+      }
+      alert("Error submitting transaction. Please try again.");
     }
   };
 
@@ -208,19 +255,25 @@ export default function TransactionUI() {
     //@ts-ignore
     localStorage.setItem("cart", []);
   };
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+  const handleSortChange = (descriptor: SortDescriptor) => {
+    setSortDescriptor(descriptor);
+  };
 
   return (
-    <div className="flex flex-col gap-4 p-4 md:flex-row">
+    <div className="flex flex-col gap-4 px-4 md:flex-row">
       <div className="w-full space-y-4 md:w-3/4">
         <div className="flex justify-start mb-4 space-x-2">
-          <Button onClick={sortMenus}>
-            Sort By Date ({sortOrder === "asc" ? "ascending" : "descending"})
-          </Button>
           <Input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search menu items..."
+            label="Search Menu Items..."
+            placeholder="Search Menu Items..."
+            labelPlacement="outside"
+            startContent={<Search />}
             className="w-full md:w-1/2"
             variant="bordered"
             endContent={
@@ -229,6 +282,111 @@ export default function TransactionUI() {
                 onClick={() => setSearchQuery("")}
               />
             }
+          />
+          <Select
+            value={filterType}
+            onChange={(e) =>
+              setFilterType(e.target.value as "All" | "Food" | "Beverage")
+            }
+            variant="bordered"
+            defaultSelectedKeys={["All"]}
+            className="w-full md:w-1/4"
+            disallowEmptySelection
+            label="Type"
+            labelPlacement="outside"
+          >
+            <SelectItem key="All" value="All">
+              All
+            </SelectItem>
+            <SelectItem key="Food" value="Food">
+              Food
+            </SelectItem>
+            <SelectItem key="Beverage" value="Beverage">
+              Beverage
+            </SelectItem>
+          </Select>
+          <Select
+            label="Rows Per Page"
+            labelPlacement="outside"
+            defaultSelectedKeys={["5"]}
+            value={rowsPerPage}
+            onChange={handleRowsPerPageChange}
+            disallowEmptySelection
+            className="w-1/4"
+            variant="bordered"
+          >
+            <SelectItem key={5} value="5">
+              5
+            </SelectItem>
+            <SelectItem key={10} value="10">
+              10
+            </SelectItem>
+            <SelectItem key={20} value="20">
+              20
+            </SelectItem>
+            <SelectItem key={50} value="50">
+              50
+            </SelectItem>
+          </Select>
+        </div>
+        <Table
+          aria-label="Menu items table"
+          sortDescriptor={sortDescriptor}
+          classNames={{
+            th: "text-sm uppercase",
+            td: " border-b border-divider text-lg",
+          }}
+          onSortChange={handleSortChange}
+        >
+          <TableHeader>
+            <TableColumn key="gambar">gambar</TableColumn>
+            <TableColumn allowsSorting key="nama_menu">
+              Name
+            </TableColumn>
+            <TableColumn allowsSorting key="jenis">
+              Type
+            </TableColumn>
+            <TableColumn key="deskripsi">Description</TableColumn>
+            <TableColumn allowsSorting key="harga">
+              Price
+            </TableColumn>
+            <TableColumn key="actions">Actions</TableColumn>
+          </TableHeader>
+          <TableBody
+            emptyContent={"No Data"}
+            items={sortedMenu}
+            loadingContent={<Spinner label="Loading..." />}
+            loadingState={loading ? "loading" : "idle"}
+          >
+            {(item) => (
+              <TableRow key={item.id_menu}>
+                <TableCell>
+                  <Image
+                    className="max-w-[17.5rem]"
+                    alt={item.nama_menu}
+                    src={renderImage(item.gambar)}
+                  />
+                </TableCell>
+                <TableCell>{item.nama_menu}</TableCell>
+                <TableCell>{item.jenis}</TableCell>
+                <TableCell>{item.deskripsi}</TableCell>
+                <TableCell>{formatter.format(item.harga)}</TableCell>
+                <TableCell>
+                  <Button color="primary" onClick={() => addToCart(item)}>
+                    Add to Cart
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        <div className="flex justify-between">
+          <Pagination
+            total={Math.ceil(filteredMenus.length / rowsPerPage)}
+            page={page}
+            onChange={handlePageChange}
+            loop
+            showControls
           />
           <Button
             onClick={() => {
@@ -242,9 +400,12 @@ export default function TransactionUI() {
                     existingItem.total_harga =
                       menu.harga * existingItem.quantity;
                   } else {
-                    const { gambar, ...menuWithoutGambar } = menu;
                     acc.push({
-                      ...menuWithoutGambar,
+                      id_menu: menu.id_menu,
+                      nama_menu: menu.nama_menu,
+                      jenis: menu.jenis,
+                      deskripsi: menu.deskripsi,
+                      harga: menu.harga,
                       quantity: 1,
                       total_harga: menu.harga,
                     });
@@ -259,47 +420,15 @@ export default function TransactionUI() {
             Add all to cart
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredMenus.map((menu) => (
-            <Card key={menu.id_menu} className="max-w-sm">
-              <CardHeader className="flex gap-3">
-                <div className="flex flex-col">
-                  <p className="text-md">
-                    {menu.nama_menu} |{" "}
-                    <span className="text-default-500">{menu.jenis}</span>
-                  </p>
-                  <p className="text-small text-default-500">
-                    {menu.deskripsi}
-                  </p>
-                </div>
-              </CardHeader>
-              {menu.gambar && (
-                <>
-                  <CardBody className="flex justify-center py-2 overflow-visible">
-                    <Image
-                      alt={menu.nama_menu}
-                      className="object-cover rounded-xl"
-                      src={renderImage(menu.gambar)}
-                    />
-                  </CardBody>
-                </>
-              )}
-              <CardFooter className="flex justify-between">
-                <p>{formatter.format(menu.harga)}</p>
-                <Button color="primary" onClick={() => addToCart(menu)}>
-                  Add to Cart
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
       </div>
       <div className="w-full mt-4 md:w-1/4 md:mt-0">
         <Input
           type="text"
           value={CartQuery}
           onChange={(e) => setCartQuery(e.target.value)}
-          placeholder="Search menu items..."
+          label="Search cart items..."
+          labelPlacement="outside"
+          placeholder="Search cart items..."
           className="w-full"
           variant="bordered"
           endContent={

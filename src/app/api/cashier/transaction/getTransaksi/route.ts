@@ -1,25 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     console.log("Fetching Transaksi...");
 
     const Transaksi = await prisma.transaksi.findMany({
       include: {
-        Detail_Transaksi: true,
-      }
+        Detail_Transaksi: {
+          include: {
+            Menu: true, // This will include the Menu details
+          },
+        },
+      },
     });
-    // const DetailTransaksi = await Promise.all(
-    //   Transaksi.map(async (item) => {
-    //     const details = await prisma.detail_Transaksi.findMany({
-    //       where: {
-    //         id_transaksi: item.id_transaksi,
-    //       },
-    //     });
-    //     return details;
-    //   })
-    // );
+    
     return NextResponse.json({
       message: "Transaksi fetched successfully",
       Transaksi,

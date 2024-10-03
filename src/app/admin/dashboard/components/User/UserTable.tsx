@@ -10,10 +10,10 @@ import {
   Button,
   Spacer,
   User,
-  Tooltip,
   Chip,
+  SortDescriptor,
 } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { Trash2 } from "lucide-react";
 import EditUser from "./EditUser";
@@ -27,9 +27,13 @@ interface User {
   password: string;
 }
 
-export default function UserTable() {
+export default function Component() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "id_user",
+    direction: "ascending",
+  });
 
   const refreshUsers = () => {
     fetchUsers();
@@ -71,15 +75,42 @@ export default function UserTable() {
     }
   };
 
+  const sortedUsers = useMemo(() => {
+    return [...users].sort((a, b) => {
+      const first = a[sortDescriptor.column as keyof User];
+      const second = b[sortDescriptor.column as keyof User];
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [users, sortDescriptor]);
+
+  const handleSortChange = (descriptor: SortDescriptor) => {
+    setSortDescriptor(descriptor);
+  };
+
   return (
     <div className="container p-4">
       <h1 className="text-2xl font-bold mb-4">User Management</h1>
-      <Table aria-label="User table" className="mb-4">
+      <Table
+        aria-label="User table"
+        className="mb-4"
+        sortDescriptor={sortDescriptor}
+        onSortChange={handleSortChange}
+      >
         <TableHeader>
-          <TableColumn>NO</TableColumn>
-          <TableColumn>USER</TableColumn>
-          <TableColumn>ROLE</TableColumn>
-          <TableColumn>USERNAME</TableColumn>
+          <TableColumn key="id_user" allowsSorting>
+            NO
+          </TableColumn>
+          <TableColumn key="nama_user" allowsSorting>
+            USER
+          </TableColumn>
+          <TableColumn key="role" allowsSorting>
+            ROLE
+          </TableColumn>
+          <TableColumn key="username" allowsSorting>
+            USERNAME
+          </TableColumn>
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
         <TableBody
@@ -88,18 +119,21 @@ export default function UserTable() {
             <div className="h-12 bg-default-100 rounded animate-pulse" />
           }
           loadingState={loading ? "loading" : "idle"}
+          items={sortedUsers}
         >
-          {users.map((user) => (
-            <TableRow key={user.id_user}>
-              <TableCell className="text-xl">{users.indexOf(user) + 1}</TableCell>
+          {(item) => (
+            <TableRow key={item.id_user}>
+              <TableCell className="text-xl">
+                {users.indexOf(item) + 1}
+              </TableCell>
               <TableCell>
                 <User
-                  name={<h1 className="text-xl">{user.nama_user}</h1>}
+                  name={<h1 className="text-xl">{item.nama_user}</h1>}
                   description={
-                    <span className="text-lg">ID: {user.id_user}</span>
+                    <span className="text-lg">ID: {item.id_user}</span>
                   }
                   avatarProps={{
-                    src: `https://api.dicebear.com/6.x/initials/svg?seed=${user.nama_user}`,
+                    src: `https://api.dicebear.com/6.x/initials/svg?seed=${item.nama_user}`,
                     style: {
                       width: "3.5rem",
                       height: "3.5rem",
@@ -109,14 +143,16 @@ export default function UserTable() {
                 />
               </TableCell>
               <TableCell>
-                <Chip color={roleColor(user.role)} variant="light">
-                  <h1 className="text-xl uppercase">{user.role}</h1>
+                <Chip color={roleColor(item.role)} variant="light">
+                  <h1 className="text-xl uppercase">{item.role}</h1>
                 </Chip>
               </TableCell>
-              <TableCell style={{width: "25%"}} className="text-xl">{user.username}</TableCell>
+              <TableCell style={{ width: "25%" }} className="text-xl">
+                {item.username}
+              </TableCell>
               <TableCell className="text-xl">
                 <div className="w-3/4 flex items-center gap-5">
-                  <EditUser user={user} refreshUsers={refreshUsers} />
+                  <EditUser user={item} refreshUsers={refreshUsers} />
                   <Button
                     className="hover:scale-110"
                     style={{
@@ -126,7 +162,7 @@ export default function UserTable() {
                     size="lg"
                     color="danger"
                     aria-label="Delete user"
-                    onClick={() => handleDelete(user.id_user)}
+                    onClick={() => handleDelete(item.id_user)}
                   >
                     <Trash2 />
                     <h1 className="text-xl">Delete User</h1>
@@ -134,7 +170,7 @@ export default function UserTable() {
                 </div>
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
       <Spacer y={4} />

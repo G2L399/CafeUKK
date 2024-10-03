@@ -7,11 +7,12 @@ import Cookies from "js-cookie";
 import Image from "next/image";
 import TransactionUI from "./components/transactionUI";
 import HistoryTable from "./components/historyTable";
+import axios from "axios";
 
 type TabKey = "transaction" | "history";
 
 export default function CashierDashboard() {
-  const [activeTab, setActiveTab] = useState<TabKey>("history");
+  const [activeTab, setActiveTab] = useState<TabKey>("transaction");
   const [CashierName, setCashierName] = useState<string>(""); // state to hold cashier name
   const [userName, setuserName] = useState<string>(""); // state to hold cashier name
 
@@ -19,9 +20,11 @@ export default function CashierDashboard() {
     setActiveTab(key);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
     // Implement logout logic here
-    console.log("Logging out...");
+    const response =await axios.get("/api/logout");
+    console.log(response);
+    
   };
   useEffect(() => {
     // Get the cashier name from cookies
@@ -94,7 +97,7 @@ export default function CashierDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 px-8 py-2">
         <h1 className="mb-6 text-3xl font-bold">Cashier Dashboard</h1>
         <div className="p-6 bg-gray-800 rounded-lg shadow">
           {activeTab === "transaction" && <TransactionUI />}

@@ -16,8 +16,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ message: "Menu added successfully", newMenu }, { status: 201 });
+    return NextResponse.json(
+      { message: "Menu added successfully", newMenu },
+      { status: 201 }
+    );
   } catch (error) {
+    console.error("Error adding menu:", error);
     return NextResponse.json({ error: "Failed to add menu" }, { status: 500 });
   }
 }

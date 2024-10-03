@@ -96,17 +96,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@nextui-org/react";
+import { Button,Image } from "@nextui-org/react";
 import { Users, CoffeeIcon, Menu, LogOut } from "lucide-react";
 import UserTable from "./components/User/UserTable";
 import MejaTable from "./components/Meja/MejaTable";
 import FoodTable from "./components/Menu/MenuTable";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 type TabKey = "users" | "meja" | "menu";
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<TabKey>("meja");
+  const [activeTab, setActiveTab] = useState<TabKey>("menu");
   const [adminName, setAdminName] = useState<string>(""); // state to hold admin name
   const [userName, setuserName] = useState<string>(""); // state to hold admin name
 
@@ -114,9 +115,13 @@ export default function AdminDashboard() {
     setActiveTab(key);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
     // Implement logout logic here
-    console.log("Logging out...");
+    const response = await axios.post("/api/logout");
+    console.log(response.headers.location);
+    window.location.href = response.headers.location; 
+    
   };
   useEffect(() => {
     // Get the admin name from cookies
@@ -143,7 +148,7 @@ export default function AdminDashboard() {
       <aside className="w-64 bg-gray-800 text-white p-6">
         <div className="flex flex-col h-full">
           <div className="flex items-center space-x-4 mb-6">
-            <img
+            <Image
               src={`https://api.dicebear.com/6.x/initials/svg?seed=${adminName}`}
               alt="Admin Profile"
               className="rounded-full"
@@ -175,8 +180,8 @@ export default function AdminDashboard() {
               transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
             }}
             color="danger"
-            onClick={handleLogout}
-            className="w-full justify-start px-4 mt-auto hover:scale-110"
+            onClick={event => handleLogout(event)}
+            className="sticky bottom-4 w-full justify-start px-4 mt-auto hover:scale-110"
             startContent={<LogOut size={24} className="mr-2" />}
           >
             Log Out
@@ -185,9 +190,9 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 px-8 py-4">
         <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-        <div className="bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-gray-800 rounded-lg shadow px-6">
           {activeTab === "users" && <UserTable />}
           {activeTab === "meja" && <MejaTable />}
           {activeTab === "menu" && <FoodTable />}

@@ -7,6 +7,7 @@ import {
   TableCell,
   Button,
   Spacer,
+  Spinner
 } from "@nextui-org/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -48,61 +49,55 @@ const MejaTable = () => {
           <TableColumn aria-label="NOMOR MEJA">NOMOR MEJA</TableColumn>
           <TableColumn aria-label="ACTIONS">ACTIONS</TableColumn>
         </TableHeader>
-        <TableBody aria-label="table body">
-          {loading ? (
-            <TableRow aria-label="table row">
-              <TableCell aria-label="loading" className="text-xl">
-                loading...
+        <TableBody
+          aria-label="table body"
+          emptyContent={
+            loading ? (<>
+            <Spinner aria-label="loading" />
+              <span className="text-xl">loading...</span>
+            </>
+            ) : (
+              <span className="text-xl">No data available</span>
+            )
+          }
+        >
+          {meja.map((item) => (
+            <TableRow key={item.id_meja} aria-label="table row">
+              <TableCell aria-label="NO" className="text-xl">
+                {meja.indexOf(item) + 1}
               </TableCell>
-              <TableCell aria-label="loading" className="text-xl">
-                loading...
+              <TableCell aria-label="ID" className="text-xl">
+                {item.id_meja}
               </TableCell>
-              <TableCell aria-label="loading" className="text-xl">
-                loading...
+              <TableCell
+                style={{
+                  width: "500px",
+                  wordBreak: "break-all",
+                  whiteSpace: "normal",
+                }}
+                aria-label="NOMOR MEJA"
+                className="text-xl"
+              >
+                {item.nomor_meja}
               </TableCell>
-              <TableCell aria-label="loading" className="text-xl">
-                loading...
+              <TableCell aria-label="DELETE" className="text-xl">
+                <EditMeja Meja={item} refreshMeja={fetchMeja} />
+                <Spacer y={5} />
+                <Button
+                  className="text-lg hover:scale-110"
+                  style={{
+                    transitionTimingFunction:
+                      "cubic-bezier(0.33, 1.52, 0.6, 1)",
+                  }}
+                  color="danger"
+                  size="lg"
+                  onClick={() => handleDelete(item.id_meja)}
+                >
+                  Delete Meja With ID {item.id_meja}
+                </Button>
               </TableCell>
             </TableRow>
-          ) : (
-            meja.map((item) => (
-              <TableRow key={item.id_meja} aria-label="table row">
-                <TableCell aria-label="NO" className="text-xl">
-                  {meja.indexOf(item) + 1}
-                </TableCell>
-                <TableCell aria-label="ID" className="text-xl">
-                  {item.id_meja}
-                </TableCell>
-                <TableCell
-                  style={{
-                    width: "500px",
-                    wordBreak: "break-all",
-                    whiteSpace: "normal",
-                  }}
-                  aria-label="NOMOR MEJA"
-                  className="text-xl"
-                >
-                  {item.nomor_meja}
-                </TableCell>
-                <TableCell aria-label="DELETE" className="text-xl">
-                  <EditMeja Meja={item} refreshMeja={fetchMeja} />
-                  <Spacer y={5}></Spacer>
-                  <Button
-                    className="text-lg hover:scale-110"
-                    style={{
-                      transitionTimingFunction:
-                        "cubic-bezier(0.33, 1.52, 0.6, 1)",
-                    }}
-                    color="danger"
-                    size="lg"
-                    onClick={() => handleDelete(item.id_meja)}
-                  >
-                    Delete Meja With ID {item.id_meja}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
+          ))}
         </TableBody>
       </Table>
       <Spacer y={5} />
