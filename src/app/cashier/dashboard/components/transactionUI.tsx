@@ -63,7 +63,7 @@ export default function TransactionUI() {
   );
 
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "nama_menu",
@@ -77,14 +77,12 @@ export default function TransactionUI() {
         menu.jenis.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const filteredCart = cart.filter(
-    (item) =>
-      item.nama_menu.toLowerCase().includes(CartQuery.toLowerCase()) ||
-      item.deskripsi.toLowerCase().includes(CartQuery.toLowerCase()) ||
-      item.jenis.toLowerCase().includes(CartQuery.toLowerCase())
+  const filteredCart = cart.filter((item) =>
+    item.nama_menu.toLowerCase().includes(CartQuery.toLowerCase())
   );
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setRowsPerPage(Number(e.target.value));
+    const value = e.target.value;
+    setRowsPerPage(value === "all" ? sortedMenu.length : Number(value));
     setPage(1);
   };
   const fetchMeja = async () => {
@@ -101,7 +99,6 @@ export default function TransactionUI() {
   }, []);
 
   useEffect(() => {
-    console.log(cart);
     const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
     if (cart.length == 0 && storedCart.length > 0) {
@@ -110,19 +107,31 @@ export default function TransactionUI() {
       localStorage.setItem("cart", JSON.stringify(cart));
     }
   }, [cart]);
+
   const sortedMenu = useMemo(() => {
     return [...filteredMenus].sort((a, b) => {
-      const first = a[sortDescriptor.column as keyof Menu];
-      const second = b[sortDescriptor.column as keyof Menu];
+      let first = a[sortDescriptor.column as keyof Menu];
+      let second = b[sortDescriptor.column as keyof Menu];
       if (first === undefined && second === undefined) return 0;
       if (first === undefined) return 1; // Treat undefined as greater than any defined value
       if (second === undefined) return -1; // Treat defined values as less than undefined
-
+      if (sortDescriptor.column === "nama_menu") {
+        first = (first as string).toLowerCase();
+        second = (second as string).toLowerCase();
+      }
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [filteredMenus, sortDescriptor]);
+  const paginatedItems = React.useMemo(() => {
+    if (rowsPerPage === sortedMenu.length) {
+      return sortedMenu;
+    }
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return sortedMenu.slice(start, end);
+  }, [sortedMenu, page, rowsPerPage]);
   const fetchMenus = async () => {
     try {
       setLoading(true);
@@ -154,33 +163,37 @@ export default function TransactionUI() {
   };
 
   const addToCart = (menu: Menu) => {
-    const existingItem = cart.find((item) => item.id_menu === menu.id_menu);
-    if (existingItem) {
-      setCart(
-        cart.map((item) =>
-          item.id_menu === menu.id_menu
-            ? {
-                ...item,
-                quantity: item.quantity + 1,
-                total_harga: item.harga * (item.quantity + 1),
-              }
-            : item
-        )
+    setCart((prevCart) => {
+      const existingItemIndex = prevCart.findIndex(
+        (item) => item.id_menu === menu.id_menu
       );
-    } else {
-      setCart([
-        ...cart,
-        {
-          harga: menu.harga,
-          id_menu: menu.id_menu,
-          jenis: menu.jenis,
-          deskripsi: menu.deskripsi,
-          nama_menu: menu.nama_menu,
-          quantity: 1,
-          total_harga: menu.harga,
-        },
-      ]);
-    }
+      console.log(existingItemIndex);
+      if (existingItemIndex !== -1) {
+        //item exists already
+        const updatedCart = [...prevCart];
+        const existingItem = updatedCart[existingItemIndex];
+        updatedCart[existingItemIndex] = {
+          ...existingItem,
+          quantity: existingItem.quantity + 1,
+          total_harga: existingItem.harga * (existingItem.quantity + 1),
+        };
+        return updatedCart;
+      } else {
+        //item doen't exist already
+        return [
+          ...prevCart,
+          {
+            harga: menu.harga,
+            id_menu: menu.id_menu,
+            jenis: menu.jenis,
+            deskripsi: menu.deskripsi,
+            nama_menu: menu.nama_menu,
+            quantity: 1,
+            total_harga: menu.harga,
+          },
+        ];
+      }
+    });
   };
 
   const removeFromCart = (id: number) => {
@@ -265,21 +278,21 @@ export default function TransactionUI() {
   return (
     <div className="flex flex-col gap-4 px-4 md:flex-row">
       <div className="w-full space-y-4 md:w-3/4">
-        <div className="flex justify-start mb-4 space-x-2">
+        <div className="flex justify-start mb-4 space-x-2" >
           <Input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            label="Search Menu Items..."
+            label={<span className="text-default-900">Search Menu Items...</span>}
             placeholder="Search Menu Items..."
             labelPlacement="outside"
             startContent={<Search />}
-            className="w-full md:w-1/2"
-            variant="bordered"
+            className="w-full md:w-1/2 text-default-900"
             endContent={
               <X
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", color: "" }}
                 onClick={() => setSearchQuery("")}
+                // className="text-default-900"
               />
             }
           />
@@ -288,14 +301,17 @@ export default function TransactionUI() {
             onChange={(e) =>
               setFilterType(e.target.value as "All" | "Food" | "Beverage")
             }
-            variant="bordered"
             defaultSelectedKeys={["All"]}
-            className="w-full md:w-1/4"
+            className="w-full md:w-1/4 text-default-900"
             disallowEmptySelection
-            label="Type"
+            label={<span className="text-default-900">Type</span>}
             labelPlacement="outside"
+            classNames={{
+              base:"",
+              listbox:"text-default-900"
+            }}
           >
-            <SelectItem key="All" value="All">
+            <SelectItem className="text-default-900" key="All" value="All">
               All
             </SelectItem>
             <SelectItem key="Food" value="Food">
@@ -306,16 +322,19 @@ export default function TransactionUI() {
             </SelectItem>
           </Select>
           <Select
-            label="Rows Per Page"
+            label={<span className="text-default-900">Rows Per Page</span>}
             labelPlacement="outside"
             defaultSelectedKeys={["5"]}
             value={rowsPerPage}
             onChange={handleRowsPerPageChange}
             disallowEmptySelection
             className="w-1/4"
-            variant="bordered"
+            classNames={{
+              base:"",
+              listbox:"text-default-900"
+            }}
           >
-            <SelectItem key={5} value="5">
+            <SelectItem key={5}  value="5">
               5
             </SelectItem>
             <SelectItem key={10} value="10">
@@ -327,19 +346,27 @@ export default function TransactionUI() {
             <SelectItem key={50} value="50">
               50
             </SelectItem>
+            <SelectItem key="all" value="all">
+              All
+            </SelectItem>
           </Select>
         </div>
         <Table
           aria-label="Menu items table"
           sortDescriptor={sortDescriptor}
+          className="max-h-[70vh]"
           classNames={{
-            th: "text-sm uppercase",
-            td: " border-b border-divider text-lg",
+            base: "max-h-[calc(100vh-200px)] overflow-y-auto",
+            th: "bg-default-100 text-default-700 border-b border-divider",
+            td: "text-default-900 border-b-[5px] border-divider",
+            thead: "[&>tr]:first:shadow-sm",
           }}
           onSortChange={handleSortChange}
+          isCompact
         >
           <TableHeader>
-            <TableColumn key="gambar">gambar</TableColumn>
+            <TableColumn key="no">No</TableColumn>
+            <TableColumn key="gambar">Gambar</TableColumn>
             <TableColumn allowsSorting key="nama_menu">
               Name
             </TableColumn>
@@ -354,12 +381,13 @@ export default function TransactionUI() {
           </TableHeader>
           <TableBody
             emptyContent={"No Data"}
-            items={sortedMenu}
+            items={paginatedItems}
             loadingContent={<Spinner label="Loading..." />}
             loadingState={loading ? "loading" : "idle"}
           >
             {(item) => (
               <TableRow key={item.id_menu}>
+                <TableCell>{menus.indexOf(item) + 1}</TableCell>
                 <TableCell>
                   <Image
                     className="max-w-[17.5rem]"
@@ -372,7 +400,15 @@ export default function TransactionUI() {
                 <TableCell>{item.deskripsi}</TableCell>
                 <TableCell>{formatter.format(item.harga)}</TableCell>
                 <TableCell>
-                  <Button color="primary" onClick={() => addToCart(item)}>
+                  <Button
+                    className="w-5/6 border hover:scale-110 bg-primary-50 border-primary-900"
+                    style={{
+                      transitionTimingFunction:
+                        "cubic-bezier(0.33, 1.52, 0.6, 1)",
+                    }}
+                    // color="primary"
+                    onClick={() => addToCart(menus[menus.indexOf(item)])}
+                  >
                     Add to Cart
                   </Button>
                 </TableCell>
@@ -389,6 +425,10 @@ export default function TransactionUI() {
             showControls
           />
           <Button
+            className="hover:scale-110 bg-default-50"
+            style={{
+              transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
+            }}
             onClick={() => {
               const newCart = menus.reduce(
                 (acc, menu) => {
@@ -421,26 +461,25 @@ export default function TransactionUI() {
           </Button>
         </div>
       </div>
-      <div className="w-full mt-4 md:w-1/4 md:mt-0">
+      <div className="w-full mt-4 md:w-1/4 md:mt-0 text-default-900">
         <Input
           type="text"
           value={CartQuery}
           onChange={(e) => setCartQuery(e.target.value)}
-          label="Search cart items..."
+          label={<span className="text-default-900">Search Cart Items...</span>}
           labelPlacement="outside"
-          placeholder="Search cart items..."
-          className="w-full"
-          variant="bordered"
+          placeholder='Search cart items...'
+          className="w-full text-default-900"
           endContent={
             <X style={{ cursor: "pointer" }} onClick={() => setCartQuery("")} />
           }
         />
         <Spacer y={4}></Spacer>
-        <Card className="sticky top-5">
+        <Card className="sticky top-5 text-default-900">
           <CardHeader>
             <h2 className="text-lg font-bold">Cart</h2>
           </CardHeader>
-          <CardBody className="space-y-4">
+          <CardBody className="space-y-4 max-h-[40vh]">
             {filteredCart.map((item) => (
               <div
                 key={item.id_menu}
@@ -486,9 +525,13 @@ export default function TransactionUI() {
                     <Plus size={16} />
                   </Button>
                   <Button
-                    color="danger"
                     size="sm"
                     onClick={() => removeFromCart(item.id_menu)}
+                    className="hover:scale-110 bg-danger-400"
+                    style={{
+                      transitionTimingFunction:
+                        "cubic-bezier(0.33, 1.52, 0.6, 1)",
+                    }}
                   >
                     Remove
                   </Button>
@@ -499,7 +542,7 @@ export default function TransactionUI() {
           <form className="w-full" onSubmit={submitTransaction}>
             <CardFooter className="flex flex-col">
               <div className="w-full">
-                <p className="text-lg font-bold">
+                <p className="text-lg font-bold text-default-900">
                   Total:{" "}
                   {formatter.format(
                     cart.reduce((sum, item) => sum + item.total_harga, 0)
@@ -507,23 +550,36 @@ export default function TransactionUI() {
                 </p>
                 <Spacer y={3} />
                 <div className="flex justify-between">
-                  <Button type="submit" className="w-5/6" color="success">
+                  <Button
+                    type="submit"
+                    className="w-5/6 hover:scale-110 bg-success-400"
+                    style={{
+                      transitionTimingFunction:
+                        "cubic-bezier(0.33, 1.52, 0.6, 1)",
+                    }}
+                  >
                     Submit Order
                   </Button>
                   <Spacer x={8} />
                   <Button
-                    className="w-5/6"
+                    className="w-5/6 hover:scale-110 bg-danger-400"
                     onClick={() => clearCart()}
-                    color="danger"
+                    style={{
+                      transitionTimingFunction:
+                        "cubic-bezier(0.33, 1.52, 0.6, 1)",
+                    }}
                   >
                     Remove all
                   </Button>
                 </div>
               </div>
               <Spacer y={5} />
-              <div className="flex flex-col w-full gap-5">
+              <div className="flex flex-col w-full gap-5 ">
                 <Input
-                  label="Customer Name"
+                  className=" text-default-900"
+                  label={
+                    <span className="text-default-900">Customer Name</span>
+                  }
                   labelPlacement="outside"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
@@ -533,7 +589,8 @@ export default function TransactionUI() {
                   isRequired
                 />
                 <Select
-                  label="Nomor Meja"
+                  className=" text-default-900"
+                  label={<span className="text-default-900">Table Number</span>}
                   labelPlacement="outside"
                   value={idmeja}
                   onChange={(e) => setIdmeja(parseInt(e.target.value, 10))}
@@ -542,7 +599,11 @@ export default function TransactionUI() {
                   isRequired
                 >
                   {mejas.map((meja) => (
-                    <SelectItem key={meja.id_meja} value={meja.id_meja}>
+                    <SelectItem
+                      className="text-default-900"
+                      key={meja.id_meja}
+                      value={meja.id_meja}
+                    >
                       {meja.nomor_meja}
                     </SelectItem>
                   ))}

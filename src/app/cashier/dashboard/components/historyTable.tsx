@@ -141,7 +141,7 @@ export default function HistoryTable() {
           label="Rows Per Page"
           value={rowsPerPage}
           onChange={handleRowsPerPageChange}
-          className="w-40 border-divider border-5 rounded-lg "
+          className="w-40 "
           disallowEmptySelection
         >
           <SelectItem key={5} value="5">

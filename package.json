@@ -27,6 +27,8 @@
     "mysql2": "^3.11.3",
     "next": "14.2.12",
     "next-auth": "^4.24.7",
+    "next-theme": "^0.1.5",
+    "next-themes": "^0.3.0",
     "nookies": "^2.5.2",
     "react": "^18",
     "react-dom": "^18",

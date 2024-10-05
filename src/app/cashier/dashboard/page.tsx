@@ -47,7 +47,7 @@ export default function CashierDashboard() {
   return (
     <div className="flex min-h-screen bg-black">
       {/* Fixed Sidebar */}
-      <aside className="w-16 p-6 text-white bg-gray-800 lg:w-64 md:w-52 sm:w-32">
+      <aside className="w-16 p-6 text-default-900 bg-default-50 lg:w-64 md:w-52 sm:w-32">
         <div className="flex flex-col h-full">
           <div className="flex items-center mb-6 space-x-4">
             <Image
@@ -58,8 +58,8 @@ export default function CashierDashboard() {
               height={50}
             />
             <div>
-              <h1 className="text-xl font-bold">{CashierName}</h1>
-              <p className="text-sm text-gray-300">{userName}</p>
+              <h1 className="text-xl font-bold text-default-900">{CashierName}</h1>
+              <p className="text-sm text-default-900">{userName}</p>
             </div>
           </div>
 
@@ -97,9 +97,9 @@ export default function CashierDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 px-8 py-2">
-        <h1 className="mb-6 text-3xl font-bold">Cashier Dashboard</h1>
-        <div className="p-6 bg-gray-800 rounded-lg shadow">
+      <main className="flex-1 px-8 py-2 bg-default-100">
+        <h1 className="mb-2 text-3xl font-bold text-default-900">Cashier Dashboard</h1>
+        <div className="p-6 rounded-lg shadow bg-default-200">
           {activeTab === "transaction" && <TransactionUI />}
           {activeTab === "history" && <HistoryTable />}
         </div>

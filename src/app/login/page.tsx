@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { Input, Button, Card, Spacer } from "@nextui-org/react";
-import axios from "axios";
-import Cookies from 'js-cookie';
-import { EyeIcon,EyeOff } from "lucide-react";
+import axios, { AxiosError } from "axios";
+import Cookies from "js-cookie";
+import { EyeIcon, EyeOff } from "lucide-react";
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -12,7 +12,6 @@ const LoginPage = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // New state for error message
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -20,38 +19,40 @@ const LoginPage = () => {
       ...prevData,
       [name]: value,
     }));
-    const token = Cookies.get('token');
+    const token = Cookies.get("token");
     console.log(token);
-    
-    
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null); // Clear previous errors
 
     try {
       const response = await axios.post("/api/login", formData);
 
       if (response.status === 200) {
         console.log(response);
-        
+
         alert(response.data.message);
         // Redirect or handle successful login here
       }
-    } catch (error: any) {
-
-      if (error.response && error.response.data && error.response.data.error) {
-        alert(error.response.data.error);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error
+        ) {
+          alert(error.response.data.error);
+        }
       } else {
-        setErrorMessage("Something went wrong. Please try again."); // Generic error message
+        alert("Something went wrong. Please try again."); // Generic error message
       }
     }
   };
 
   return (
     <Card style={{ margin: "auto", maxWidth: "400px", padding: "20px" }}>
-      <h2>Login</h2>
+      <h2 className="text-default-900">Login</h2>
       <form onSubmit={handleSubmit}>
         <Spacer y={1} />
         <Input
@@ -74,15 +75,19 @@ const LoginPage = () => {
           required
           fullWidth
           endContent={
-            <button className="focus:outline-none" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
+            <button
+              className="focus:outline-none"
+              type="button"
+              onClick={toggleVisibility}
+              aria-label="toggle password visibility"
+            >
               {isVisible ? (
-                <EyeOff className="text-2xl text-default-400 pointer-events-none" />
+                <EyeOff className="text-2xl pointer-events-none text-default-400" />
               ) : (
-                <EyeIcon className="text-2xl text-default-400 pointer-events-none" />
+                <EyeIcon className="text-2xl pointer-events-none text-default-400" />
               )}
             </button>
           }
-          
         />
         <Spacer y={1.5} />
         <Button type="submit" color="primary" fullWidth>

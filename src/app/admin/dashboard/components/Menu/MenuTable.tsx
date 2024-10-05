@@ -203,7 +203,7 @@ export default function FoodTable() {
     return new Intl.NumberFormat("en-EN", {
       style: "currency",
       currency: "IDR",
-      notation: "compact",
+      notation: "scientific",
     }).format(value);
   }
   return (
@@ -248,7 +248,7 @@ export default function FoodTable() {
               {currentFoods.map((food) => (
                 <TableRow key={food.id_menu}>
                   <TableCell className="text-xl">
-                    {currentFoods.indexOf(food) + 1}
+                    {foods.indexOf(food) + 1}
                   </TableCell>
                   <TableCell className="text-xl">
                     <div
