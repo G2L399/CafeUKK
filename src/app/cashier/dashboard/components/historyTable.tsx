@@ -23,15 +23,23 @@ import {
   SelectItem,
   Spacer,
 } from "@nextui-org/react";
-
+interface User {
+  id_user: number;
+  nama_user: string;
+  password: string;
+  role: string;
+  username: string;
+}
 interface Transaksi {
+  id_transaksi: number;
   tgl_transaksi: string;
   nama_pelanggan: string;
   status: string;
   total_harga: number;
   Detail_Transaksi: Detail_Transaksi[];
+  User: User; // Add the User interface here
 }
-interface Detail_Transaksi {
+interface Detail_Transaksi extends Transaksi {
   Menu: Menu;
   jumlah: number;
   total_harga: number;
@@ -52,10 +60,18 @@ enum Jenis {
 }
 export default function HistoryTable() {
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
+  const [Detailtransaksi, setDetailTransaksi] = useState<Detail_Transaksi[]>(
+    []
+  );
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "tgl_transaksi",
     direction: "ascending",
   });
+  const [sortDetailDescriptor, setSortDetailDescriptor] =
+    useState<SortDescriptor>({
+      column: "nama_menu",
+      direction: "ascending",
+    });
   const [loading, setLoading] = useState(true);
   const [selectedTransaksi, setSelectedTransaksi] = useState<Transaksi | null>(
     null
@@ -71,7 +87,10 @@ export default function HistoryTable() {
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error("Error fetching transaksi:", error.message);
-        console.error(error);
+        console.error(error.response);
+        if (error.response?.status === 305) {
+          window.location.href = `/${error.response?.data.redirectUrl}`;
+        }
       } else {
         console.error("Unexpected error:", error);
       }
@@ -79,7 +98,11 @@ export default function HistoryTable() {
       setLoading(false);
     }
   };
-
+  const changestatus = async (id: number) => {
+    await axios.post(
+      "/api/cashier/transaction/changeStatus/" + id
+    );
+  };
   useEffect(() => {
     fetchTransaksi();
   }, []);
@@ -114,6 +137,34 @@ export default function HistoryTable() {
     });
   }, [transaksi, sortDescriptor]);
 
+  const sortedDetail = useMemo(() => {
+    return [...Detailtransaksi].sort((a, b) => {
+      let first;
+      let second;
+      console.log(sortDetailDescriptor);
+      if (sortDetailDescriptor.column === "nama_menu") {
+        first = a.Menu?.nama_menu?.toLowerCase() ?? ""; // Safely access nested property
+        second = b.Menu?.nama_menu?.toLowerCase() ?? "";
+      } else {
+        // Handle other columns
+        first = a[sortDetailDescriptor.column as keyof Detail_Transaksi];
+        second = b[sortDetailDescriptor.column as keyof Detail_Transaksi];
+      }
+      // // Special handling for the number
+      if (sortDetailDescriptor.column === "No") {
+        first = Detailtransaksi.indexOf(a) + 1;
+        second = Detailtransaksi.indexOf(b) + 1;
+      } else if (sortDetailDescriptor.column === "nama_menu") {
+        first = (first as string).toLowerCase();
+        second = (second as string).toLowerCase();
+      }
+
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+      return sortDetailDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [Detailtransaksi, sortDetailDescriptor]);
+
   const paginatedItems = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
@@ -130,18 +181,29 @@ export default function HistoryTable() {
   const handleSortChange = (descriptor: SortDescriptor) => {
     setSortDescriptor(descriptor);
   };
+  const handleDetailSortChange = (descriptor: SortDescriptor) => {
+    setSortDetailDescriptor(descriptor);
+  };
   const handleOpenModal = (item: Transaksi) => {
     setSelectedTransaksi(item);
+    console.log(item.Detail_Transaksi);
+    setDetailTransaksi(item.Detail_Transaksi);
     onOpen();
   };
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
         <Select
-          label="Rows Per Page"
+          label={<span className="text-default-900">Rows Per Page</span>}
+          labelPlacement="outside"
+          defaultSelectedKeys={["10"]}
           value={rowsPerPage}
           onChange={handleRowsPerPageChange}
           className="w-40 "
+          classNames={{
+            base: "",
+            listbox: "text-default-900",
+          }}
           disallowEmptySelection
         >
           <SelectItem key={5} value="5">
@@ -158,14 +220,14 @@ export default function HistoryTable() {
           </SelectItem>
         </Select>
         <div className="flex justify-center">
-        <Pagination
-          total={Math.ceil(sortedItems.length / rowsPerPage)}
-          page={page}
-          onChange={handlePageChange}
-          loop
-          showControls
-        />
-      </div>
+          <Pagination
+            total={Math.ceil(sortedItems.length / rowsPerPage)}
+            page={page}
+            onChange={handlePageChange}
+            loop
+            showControls
+          />
+        </div>
       </div>
       <Spacer y={5}></Spacer>
       <div className="overflow-hidden border rounded-lg border-divider">
@@ -177,9 +239,9 @@ export default function HistoryTable() {
           className="max-h-[65vh]"
           classNames={{
             base: "max-h-[calc(100vh-200px)] overflow-y-auto",
-            th: "bg-default-100 text-default-700 border-b border-divider",
-            td: " border-b border-divider",
-            thead: "[&>tr]:first:shadow-sm",
+            th: "bg-default-100 text-default-900 border-b border-divider",
+            td: "text-default-900 border-b border-divider",
+            thead: "text-default-900 [&>tr]:first:shadow-sm",
           }}
         >
           <TableHeader>
@@ -221,6 +283,17 @@ export default function HistoryTable() {
                 </TableCell>
                 <TableCell className="text-md">
                   {item.status.toLocaleUpperCase()}
+                  <Button
+                    onClick={() => {
+                      Promise.resolve(changestatus(item.id_transaksi)).then(
+                        () => {
+                          fetchTransaksi();
+                        }
+                      );
+                    }}
+                  >
+                    change lol
+                  </Button>
                 </TableCell>
                 <TableCell className="text-md">
                   {item.total_harga.toLocaleString("en-EN", {
@@ -249,34 +322,57 @@ export default function HistoryTable() {
               </ModalHeader>
               <ModalBody>
                 {selectedTransaksi && (
-                  <Table aria-label="Transaction details table">
+                  <Table
+                    aria-label="Transaction details table"
+                    sortDescriptor={sortDetailDescriptor}
+                    onSortChange={handleDetailSortChange}
+                  >
                     <TableHeader>
-                      <TableColumn>Menu</TableColumn>
-                      <TableColumn>Quantity</TableColumn>
-                      <TableColumn>Total Price</TableColumn>
+                      <TableColumn allowsSorting key="No">
+                        No
+                      </TableColumn>
+                      <TableColumn allowsSorting key="nama_menu">
+                        Menu
+                      </TableColumn>
+                      <TableColumn allowsSorting key="jumlah">
+                        Quantity
+                      </TableColumn>
+                      <TableColumn allowsSorting key="total_harga">
+                        Total Price
+                      </TableColumn>
                     </TableHeader>
-                    <TableBody>
-                      {selectedTransaksi.Detail_Transaksi.map(
-                        (detail, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{detail.Menu.nama_menu}</TableCell>
-                            <TableCell>{detail.jumlah}</TableCell>
+                    <TableBody items={sortedDetail}>
+                      {(item) => {
+                        console.log(item);
+                        return (
+                          <TableRow
+                            key={selectedTransaksi.Detail_Transaksi.indexOf(
+                              item
+                            )}
+                          >
                             <TableCell>
-                              {detail.total_harga.toLocaleString("en-EN", {
+                              {selectedTransaksi.Detail_Transaksi.indexOf(
+                                item
+                              ) + 1}
+                            </TableCell>
+                            <TableCell>{item.Menu.nama_menu}</TableCell>
+                            <TableCell>{item.jumlah}</TableCell>
+                            <TableCell>
+                              {item.total_harga.toLocaleString("en-EN", {
                                 style: "currency",
                                 currency: "IDR",
                                 notation: "compact",
                               })}
                             </TableCell>
                           </TableRow>
-                        )
-                      )}
+                        );
+                      }}
                     </TableBody>
                   </Table>
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button className="text-md bg-danger-400" onPress={onClose}>
                   Close
                 </Button>
               </ModalFooter>

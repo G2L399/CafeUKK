@@ -96,6 +96,7 @@ export default function TransactionUI() {
   useEffect(() => {
     fetchMenus();
     fetchMeja();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -278,12 +279,14 @@ export default function TransactionUI() {
   return (
     <div className="flex flex-col gap-4 px-4 md:flex-row">
       <div className="w-full space-y-4 md:w-3/4">
-        <div className="flex justify-start mb-4 space-x-2" >
+        <div className="flex items-end justify-start mb-4 space-x-2">
           <Input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            label={<span className="text-default-900">Search Menu Items...</span>}
+            label={
+              <span className="text-default-900">Search Menu Items...</span>
+            }
             placeholder="Search Menu Items..."
             labelPlacement="outside"
             startContent={<Search />}
@@ -307,11 +310,11 @@ export default function TransactionUI() {
             label={<span className="text-default-900">Type</span>}
             labelPlacement="outside"
             classNames={{
-              base:"",
-              listbox:"text-default-900"
+              base: "",
+              listbox: "text-default-900",
             }}
           >
-            <SelectItem className="text-default-900" key="All" value="All">
+            <SelectItem key="All" value="All">
               All
             </SelectItem>
             <SelectItem key="Food" value="Food">
@@ -330,11 +333,11 @@ export default function TransactionUI() {
             disallowEmptySelection
             className="w-1/4"
             classNames={{
-              base:"",
-              listbox:"text-default-900"
+              base: "text-default-900",
+              listbox: "text-default-900",
             }}
           >
-            <SelectItem key={5}  value="5">
+            <SelectItem key={5} value="5">
               5
             </SelectItem>
             <SelectItem key={10} value="10">
@@ -350,6 +353,7 @@ export default function TransactionUI() {
               All
             </SelectItem>
           </Select>
+          <div></div>
         </div>
         <Table
           aria-label="Menu items table"
@@ -418,6 +422,7 @@ export default function TransactionUI() {
         </Table>
         <div className="flex justify-between">
           <Pagination
+            className="h-full"
             total={Math.ceil(filteredMenus.length / rowsPerPage)}
             page={page}
             onChange={handlePageChange}
@@ -468,7 +473,7 @@ export default function TransactionUI() {
           onChange={(e) => setCartQuery(e.target.value)}
           label={<span className="text-default-900">Search Cart Items...</span>}
           labelPlacement="outside"
-          placeholder='Search cart items...'
+          placeholder="Search cart items..."
           className="w-full text-default-900"
           endContent={
             <X style={{ cursor: "pointer" }} onClick={() => setCartQuery("")} />

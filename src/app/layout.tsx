@@ -1,5 +1,5 @@
 "use client"
-import { useEffect } from "react";
+// import { useEffect } from "react";
 // import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -21,39 +21,39 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useEffect(() => {
-    // Check for previously saved theme preference
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      document.body.classList.add(savedTheme);
-    }
+  // useEffect(() => {
+  //   // Check for previously saved theme preference
+  //   const savedTheme = localStorage.getItem("theme");
+  //   if (savedTheme) {
+  //     document.body.classList.add(savedTheme);
+  //   }
 
-    // Function to handle the toggle
-    const toggleTheme = () => {
-      document.body.classList.toggle("dark");
-      if (document.body.classList.contains("dark")) {
-        localStorage.setItem("theme", "dark");
-      } else {
-        localStorage.removeItem("theme");
-      }
-    };
+  //   // Function to handle the toggle
+  //   const toggleTheme = () => {
+  //     document.body.classList.toggle("dark");
+  //     if (document.body.classList.contains("dark")) {
+  //       localStorage.setItem("theme", "dark");
+  //     } else {
+  //       localStorage.removeItem("theme");
+  //     }
+  //   };
 
-    // Adding the button to toggle dark/light mode
-    const button = document.createElement("button");
-    button.innerText = "Toggle Dark/Light Mode";
-    button.style.padding = "10px 20px";
-    button.style.fontSize = "16px";
-    button.style.cursor = "pointer";
-    button.style.marginTop = "20px";
-    button.onclick = toggleTheme;
+  //   // Adding the button to toggle dark/light mode
+  //   const button = document.createElement("button");
+  //   button.innerText = "Toggle Dark/Light Mode";
+  //   button.style.padding = "10px 20px";
+  //   button.style.fontSize = "16px";
+  //   button.style.cursor = "pointer";
+  //   button.style.marginTop = "20px";
+  //   button.onclick = toggleTheme;
 
-    document.body.prepend(button); // Add the button to the body
+  //   document.body.prepend(button); // Add the button to the body
 
-    // Cleanup on component unmount
-    return () => {
-      button.remove();
-    };
-  }, []);
+  //   // Cleanup on component unmount
+  //   return () => {
+  //     button.remove();
+  //   };
+  // }, []);
 
   return (
     <html lang="en">

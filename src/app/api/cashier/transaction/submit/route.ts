@@ -3,21 +3,15 @@ import prisma from "@/lib/prisma";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
-  console.log("indian button");
-
   const body = await req.json();
 
   const { customerName } = body;
-  console.log(customerName);
 
   const { total_harga } = body;
-  console.log(total_harga);
 
   const { cart } = body;
-  console.log(cart);
 
   const { idmeja } = body;
-  console.log(idmeja);
 
   // Validate the request body
   if (!cart || !customerName || !idmeja || !total_harga) {

@@ -10,8 +10,10 @@ export async function GET() {
         Detail_Transaksi: {
           include: {
             Menu: true, // This will include the Menu details
+
           },
         },
+        User: true,
       },
     });
     

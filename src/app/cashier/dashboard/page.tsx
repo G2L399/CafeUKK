@@ -1,30 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@nextui-org/react";
-import { CreditCard, Receipt, LogOut } from "lucide-react";
+import { Button, Switch } from "@nextui-org/react";
+import { CreditCard, Receipt, LogOut, Moon, Sun } from "lucide-react";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import TransactionUI from "./components/transactionUI";
 import HistoryTable from "./components/historyTable";
 import axios from "axios";
-
+import { useTheme } from "next-themes";
+import "@/app/globals.css";
 type TabKey = "transaction" | "history";
 
 export default function CashierDashboard() {
-  const [activeTab, setActiveTab] = useState<TabKey>("transaction");
+  const [activeTab, setActiveTab] = useState<TabKey>("history");
   const [CashierName, setCashierName] = useState<string>(""); // state to hold cashier name
   const [userName, setuserName] = useState<string>(""); // state to hold cashier name
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const handleTabChange = (key: TabKey) => {
     setActiveTab(key);
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     // Implement logout logic here
-    const response =await axios.get("/api/logout");
+    const response = await axios.get("/api/logout");
     console.log(response);
-    
+  };
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+    // You would typically update your app's theme here
+    // For example: document.documentElement.classList.toggle('dark')
   };
   useEffect(() => {
     // Get the cashier name from cookies
@@ -38,6 +45,12 @@ export default function CashierDashboard() {
     }
     console.log(`Cashier name: ${name}`);
   }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
+
 
   const tabConfig = [
     { key: "transaction" as const, label: "transaction", icon: CreditCard },
@@ -58,7 +71,9 @@ export default function CashierDashboard() {
               height={50}
             />
             <div>
-              <h1 className="text-xl font-bold text-default-900">{CashierName}</h1>
+              <h1 className="text-xl font-bold text-default-900">
+                {CashierName}
+              </h1>
               <p className="text-sm text-default-900">{userName}</p>
             </div>
           </div>
@@ -69,17 +84,34 @@ export default function CashierDashboard() {
                 key={key}
                 color={activeTab === key ? "primary" : "default"}
                 onClick={() => handleTabChange(key)}
-                className="justify-start w-full px-4"
-                startContent={<Icon size={24} className="mr-2" />}
+                className="justify-start w-full px-4 border border-primary-900"
+                // startContent={<Icon size={24} className="mr-2" />}
               >
-                <span className="block sm:hidden">
+                <span className="block">
                   {/* Only show this on small screens */}
                   <Icon size={24} />
                 </span>
-                <span className="hidden sm:block">{label}</span>
+                <span className="block">{label}</span>
                 {/* Only show this on larger screens */}
               </Button>
             ))}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {/* <Sun style={{ marginRight: 8 }} /> */}
+              <Switch
+                size="lg"
+                checked={theme === "dark"}
+                onChange={toggleTheme}
+                thumbIcon={({ isSelected, className }) =>
+                  isSelected ? (
+                    <Sun className={className} /> // Sun icon for dark mode
+                  ) : (
+                    <Moon className={className} /> // Moon icon for light mode
+                  )
+                }
+                // size="lg"
+              />
+              {/* <Moon style={{ marginLeft: 8 }} /> */}
+            </div>
           </nav>
 
           <Button
@@ -98,7 +130,9 @@ export default function CashierDashboard() {
 
       {/* Main Content */}
       <main className="flex-1 px-8 py-2 bg-default-100">
-        <h1 className="mb-2 text-3xl font-bold text-default-900">Cashier Dashboard</h1>
+        <h1 className="mb-2 text-3xl font-bold text-default-900">
+          Cashier Dashboard
+        </h1>
         <div className="p-6 rounded-lg shadow bg-default-200">
           {activeTab === "transaction" && <TransactionUI />}
           {activeTab === "history" && <HistoryTable />}
