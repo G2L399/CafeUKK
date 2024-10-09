@@ -23,7 +23,7 @@ import {
   SelectItem,
   Spacer,
 } from "@nextui-org/react";
-import jsPDF from "jspdf";
+
 export interface User {
   id_user: number;
   nama_user: string;
@@ -59,7 +59,8 @@ export enum Jenis {
   BEVERAGE = "BEVERAGE",
   // Add more as needed
 }
-export default function HistoryTable() {
+
+export default function ManagerDashboard() {
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
   const [Detailtransaksi, setDetailTransaksi] = useState<Detail_Transaksi[]>(
     []
@@ -80,16 +81,18 @@ export default function HistoryTable() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [startDate, setstartDate] = useState<string>("");
+  const [endDate, setendDate] = useState<string>("");
   const fetchTransaksi = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/cashier/transaction/getTransaksi");
+      const response = await axios.get("/api/manager/getTransaksi");
       setTransaksi(response.data.Transaksi);
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error("Error fetching transaksi:", error.message);
         console.error(error.response);
-        if (error.response?.status === 305) {
+        if (error.response?.data.redirectUrl === "login") {
           window.location.href = `/${error.response?.data.redirectUrl}`;
         }
       } else {
@@ -99,22 +102,24 @@ export default function HistoryTable() {
       setLoading(false);
     }
   };
-  const changestatus = async (id: number) => {
-    await axios.post("/api/cashier/transaction/changeStatus/" + id);
-  };
   useEffect(() => {
     fetchTransaksi();
   }, []);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+
+    // Define options for the date formatting
+    const options: Intl.DateTimeFormatOptions = {
+      month: "short", // Abbreviated month
+      day: "numeric", // Day of the month
+      year: "numeric", // Year
+      hour: "numeric", // Hour
+      minute: "numeric", // Minute
+      hour12: true, // Use 12-hour time format (AM/PM)
+    };
+
+    // Format the date using Intl.DateTimeFormat
+    return new Intl.DateTimeFormat("en-US", options).format(date);
   };
   const sortedItems = useMemo(() => {
     return [...transaksi].sort((a, b) => {
@@ -149,7 +154,7 @@ export default function HistoryTable() {
         second = b[sortDetailDescriptor.column as keyof Detail_Transaksi];
       }
       // // Special handling for the number
-      if (sortDetailDescriptor.column === "no") {
+      if (sortDetailDescriptor.column === "No") {
         first = Detailtransaksi.indexOf(a) + 1;
         second = Detailtransaksi.indexOf(b) + 1;
       } else if (sortDetailDescriptor.column === "nama_menu") {
@@ -162,12 +167,30 @@ export default function HistoryTable() {
       return sortDetailDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [Detailtransaksi, sortDetailDescriptor]);
-
+  const DateFiltered = useMemo(() => {
+    return sortedItems.filter((item) => {
+      const itemDate = new Date(item.tgl_transaksi);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      // Check if itemDate falls between the start and end dates
+      if (!start && !end) {
+        return true;
+      }
+      if (start && !end) {
+        return itemDate >= start;
+      }
+      if (end && !start) {
+        return itemDate <= end;
+      }
+      return itemDate >= start! && itemDate <= end!;
+    });
+  }, [endDate, sortedItems, startDate]);
   const paginatedItems = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    return sortedItems.slice(start, end);
-  }, [sortedItems, page, rowsPerPage]);
+    return DateFiltered.slice(start, end);
+  }, [DateFiltered, page, rowsPerPage]);
+
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
@@ -188,76 +211,58 @@ export default function HistoryTable() {
     setDetailTransaksi(item.Detail_Transaksi);
     onOpen();
   };
-  const handleExportPDF = (items: Array<Detail_Transaksi>) => {
-    console.log(items);
-
-    const doc = new jsPDF();
-    doc.text(`Transaction ID: ${selectedTransaksi?.id_transaksi}`, 10, 10);
-
-    let y = 20;
-    items.forEach((item) => {
-      doc.text(`Menu: ${item.Menu.nama_menu}`, 10, y);
-      y += 10;
-      doc.text(`Quantity: ${item.jumlah}`, 10, y);
-      y += 10;
-      doc.text(
-        `Total Price: ${item.total_harga.toLocaleString("en-EN", {
-          style: "currency",
-          currency: "IDR",
-          notation: "compact",
-        })}`,
-        10,
-        y
-      );
-      y += 10;
-      doc.line(10, y, 200, y);
-      y += 10;
-    });
-    doc.text(
-      `Total Price: ${selectedTransaksi?.total_harga.toLocaleString("en-EN", {
-        style: "currency",
-        currency: "IDR",
-        notation: "compact",
-      })}`,
-      10,
-      y
-    );
-    y += 10;
-    doc.text(`Customer Name: ${selectedTransaksi?.nama_pelanggan}`, 10, y);
-    doc.save(`transaction_${selectedTransaksi?.id_transaksi}.pdf`);
-  };
   return (
-    <div className="w-full">
+    <div className="w-full h-full px-10 py-5 overflow-hidden bg-default-50">
       <div className="flex items-center justify-between mb-4">
-        <Select
-          label={<span className="text-default-900">Rows Per Page</span>}
-          labelPlacement="outside"
-          defaultSelectedKeys={["10"]}
-          value={rowsPerPage}
-          onChange={handleRowsPerPageChange}
-          className="w-40 "
-          classNames={{
-            base: "",
-            listbox: "text-default-900",
-          }}
-          disallowEmptySelection
-        >
-          <SelectItem key={5} value="5">
-            5
-          </SelectItem>
-          <SelectItem key={10} value="10">
-            10
-          </SelectItem>
-          <SelectItem key={20} value="20">
-            20
-          </SelectItem>
-          <SelectItem key={50} value="50">
-            50
-          </SelectItem>
-        </Select>
+        <div className="flex justify-between">
+          <div>
+            <label htmlFor="startDate"><pre>Start Date</pre></label>
+            <input
+              onChange={(e) => {
+                setstartDate(e.target.value);
+              }}
+              value={startDate}
+              id="startDate"
+              type="datetime-local"
+              name="startDate"
+            />
+            {/* <Button
+              size="sm"
+              className="ml-2"
+              onClick={() => {
+                setstartDate("");
+              }}
+            >
+              Clear
+            </Button> */}
+          </div>
+          <Spacer x={5}></Spacer>
+          <div>
+            <label htmlFor="endDate"><pre>End Date</pre></label>
+            <input
+              onChange={(e) => {
+                setendDate(e.target.value);
+              }}
+              value={endDate}
+              id="endDate"
+              type="datetime-local"
+              name="endDate"
+            />
+            {/* <Button
+              size="sm"
+              className="ml-2"
+              onClick={() => {
+                setendDate("");
+              }}
+            >
+              Clear
+            </Button> */}
+          </div>
+        </div>
+
         <div className="flex justify-center">
           <Pagination
-            total={Math.ceil(sortedItems.length / rowsPerPage)}
+            total={Math.ceil(DateFiltered.length / rowsPerPage)}
             page={page}
             onChange={handlePageChange}
             loop
@@ -266,7 +271,7 @@ export default function HistoryTable() {
         </div>
       </div>
       <Spacer y={5}></Spacer>
-      <div className="overflow-hidden border rounded-lg border-divider">
+      <div className="overflow-hidden ">
         <Table
           isHeaderSticky
           aria-label="Transaction history table"
@@ -306,55 +311,74 @@ export default function HistoryTable() {
             loadingContent={<Spinner label="Loading..." />}
             loadingState={loading ? "loading" : "idle"}
           >
-            {(item) => (
-              <TableRow key={item.tgl_transaksi}>
-                <TableCell className="text-md">
-                  {transaksi.indexOf(item) + 1}
-                </TableCell>
-                <TableCell className="text-md">
-                  {formatDate(item.tgl_transaksi)}
-                </TableCell>
-                <TableCell className="text-md">
-                  {item.nama_pelanggan.toLocaleUpperCase()}
-                </TableCell>
-                <TableCell className="text-md">
-                  {item.status.toLocaleUpperCase()}
-                  <Button
-                    color="primary"
-                    onClick={() => {
-                      Promise.resolve(changestatus(item.id_transaksi)).then(
-                        () => {
-                          fetchTransaksi();
-                        }
-                      );
-                    }}
-                  >
-                    change lol
-                  </Button>
-                </TableCell>
-                <TableCell className="text-md">
-                  {item.total_harga.toLocaleString("en-EN", {
-                    style: "currency",
-                    currency: "IDR",
-                    notation: "compact",
-                  })}
-                </TableCell>
-                <TableCell>
-                  <Button size="lg" onClick={() => handleOpenModal(item)}>
-                    VIEW DETAILS
-                  </Button>
-                </TableCell>
-              </TableRow>
-            )}
+            {(item) => {
+              console.log(item.tgl_transaksi);
+
+              return (
+                <TableRow key={item.tgl_transaksi}>
+                  <TableCell className="text-md">
+                    {transaksi.indexOf(item) + 1}
+                  </TableCell>
+                  <TableCell className="text-md">
+                    {formatDate(item.tgl_transaksi)}
+                  </TableCell>
+                  <TableCell className="text-md">
+                    {item.nama_pelanggan.toLocaleUpperCase()}
+                  </TableCell>
+                  <TableCell className="text-md">
+                    {item.status.toLocaleUpperCase()}
+                  </TableCell>
+                  <TableCell className="text-md">
+                    {item.total_harga.toLocaleString("en-EN", {
+                      style: "currency",
+                      currency: "IDR",
+                      notation: "compact",
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <Button size="lg" onClick={() => handleOpenModal(item)}>
+                      VIEW DETAILS
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            }}
           </TableBody>
         </Table>
+        <Spacer y={5}></Spacer>
+        <Select
+          label={<span className="text-default-900">Rows Per Page</span>}
+          labelPlacement="outside"
+          defaultSelectedKeys={["10"]}
+          value={rowsPerPage}
+          onChange={handleRowsPerPageChange}
+          className="w-40 "
+          classNames={{
+            base: "text-default-900",
+            listbox: "text-default-900",
+          }}
+          disallowEmptySelection
+        >
+          <SelectItem key={5} value="5">
+            5
+          </SelectItem>
+          <SelectItem key={10} value="10">
+            10
+          </SelectItem>
+          <SelectItem key={20} value="20">
+            20
+          </SelectItem>
+          <SelectItem key={50} value="50">
+            50
+          </SelectItem>
+        </Select>
       </div>
       <Spacer y={5}></Spacer>
       <Modal backdrop="blur" isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <ModalHeader className="flex flex-col gap-1 text-default-900">
                 Transaction Details
               </ModalHeader>
               <ModalBody>
@@ -363,9 +387,15 @@ export default function HistoryTable() {
                     aria-label="Transaction details table"
                     sortDescriptor={sortDetailDescriptor}
                     onSortChange={handleDetailSortChange}
+                    classNames={{
+                      base: "max-h-[calc(100vh-200px)] overflow-y-auto",
+                      th: "bg-default-100 text-default-900 border-b border-divider",
+                      td: "text-default-900 border-b border-divider",
+                      thead: "text-default-900 [&>tr]:first:shadow-sm",
+                    }}
                   >
                     <TableHeader>
-                      <TableColumn allowsSorting key="no">
+                      <TableColumn allowsSorting key="No">
                         No
                       </TableColumn>
                       <TableColumn allowsSorting key="nama_menu">
@@ -377,7 +407,6 @@ export default function HistoryTable() {
                       <TableColumn allowsSorting key="total_harga">
                         Total Price
                       </TableColumn>
-                      <TableColumn>Export</TableColumn>
                     </TableHeader>
                     <TableBody items={sortedDetail}>
                       {(item) => {
@@ -400,14 +429,6 @@ export default function HistoryTable() {
                                 currency: "IDR",
                                 notation: "compact",
                               })}
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                className="text-md bg-primary-400"
-                                onPress={() => handleExportPDF(sortedDetail)}
-                              >
-                                Export
-                              </Button>
                             </TableCell>
                           </TableRow>
                         );

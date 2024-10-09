@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const token = jwt.sign(
       { user },
       JWT_SECRET,
-      { expiresIn: "24h" } // Token expires in 1 day
+      { expiresIn: "1y" } // Token expires in 1 day
     );
     const response = NextResponse.json({ message: "Login successful", user });
     response.cookies.set("token", token, {

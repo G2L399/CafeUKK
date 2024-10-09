@@ -13,7 +13,7 @@ import "@/app/globals.css";
 type TabKey = "transaction" | "history";
 
 export default function CashierDashboard() {
-  const [activeTab, setActiveTab] = useState<TabKey>("history");
+  const [activeTab, setActiveTab] = useState<TabKey>("transaction");
   const [CashierName, setCashierName] = useState<string>(""); // state to hold cashier name
   const [userName, setuserName] = useState<string>(""); // state to hold cashier name
   const [mounted, setMounted] = useState(false);

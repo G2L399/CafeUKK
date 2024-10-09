@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   if (!token) {
     console.log("No token found, redirecting to login");
     return NextResponse.json(
-      { message: "Access Denied", redirectUrl: "login" },
+      { message: "No Token, Access Denied", redirectUrl: "login" },
       { status: 305 }
     );
   }
@@ -34,12 +34,12 @@ export async function middleware(request: NextRequest) {
     if (
       (pathname.startsWith("/api/admin") && userRole !== "admin") ||
       (pathname.startsWith("/api/cashier") && userRole !== "cashier") ||
-      (pathname.startsWith("/api/manajer") && userRole !== "manajer")
+      (pathname.startsWith("/api/manager") && userRole !== "manajer")
     ) {
       console.log("Access denied, redirecting to login cashier");
 
       return NextResponse.json(
-        { message: "Access Denied", redirectUrl: "login" },
+        { message: "Access Denied, You're not The Authorized User", redirectUrl: "login" },
         { status: 302 }
       );
     }
@@ -48,12 +48,12 @@ export async function middleware(request: NextRequest) {
   } catch (error) {
     console.error("Token verification failed:", error);
     return NextResponse.json(
-      { message: "Access Denied", redirectUrl: "login" },
+      { message: "Error Occured", redirectUrl: "login" },
       { status: 301 }
     );
   }
 }
 
 export const config = {
-  matcher: ["/api/admin/:path*", "/api/cashier/:path*", "/api/manajer/:path*"],
+  matcher: ["/api/admin/:path*", "/api/cashier/:path*", "/api/manager/:path*"],
 };

@@ -1,9 +1,17 @@
 "use client";
 import { useState } from "react";
-import { Input, Button, Card, Spacer } from "@nextui-org/react";
+import {
+  Input,
+  Button,
+  Card,
+  Spacer,
+  CardHeader,
+  Divider,
+  CardFooter,
+  CardBody,
+} from "@nextui-org/react";
 import axios, { AxiosError } from "axios";
-import Cookies from "js-cookie";
-import { EyeIcon, EyeOff } from "lucide-react";
+import { EyeIcon, EyeOff, LogInIcon } from "lucide-react";
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -19,8 +27,6 @@ const LoginPage = () => {
       ...prevData,
       [name]: value,
     }));
-    const token = Cookies.get("token");
-    console.log(token);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,50 +57,73 @@ const LoginPage = () => {
   };
 
   return (
-    <Card style={{ margin: "auto", maxWidth: "400px", padding: "20px" }}>
-      <h2 className="text-default-900">Login</h2>
-      <form onSubmit={handleSubmit}>
-        <Spacer y={1} />
-        <Input
-          label="Username"
-          placeholder="Enter your username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          required
-          fullWidth
-        />
-        <Spacer y={1} />
-        <Input
-          label="Password"
-          placeholder="Enter your password"
-          name="password"
-          type={isVisible ? "text" : "password"}
-          value={formData.password}
-          onChange={handleChange}
-          required
-          fullWidth
-          endContent={
-            <button
-              className="focus:outline-none"
-              type="button"
-              onClick={toggleVisibility}
-              aria-label="toggle password visibility"
+    <div className="bg-default-50 w-full h-full flex align-middle">
+      <Card
+        className="max-w-md bg-default-100 w-3/4 flex justify-center"
+        style={{ margin: "auto", padding: "20px" }}
+      >
+        <CardHeader className="text-default-900 flex flex-col items-start">
+          <span className="text-3xl">Login</span>{" "}
+          <Spacer x={0.5} y={2}></Spacer>
+          <small>Login to your account to access this app</small>
+        </CardHeader>
+        <Divider />
+        <form onSubmit={handleSubmit}>
+          <CardBody>
+            <Input
+              label={<span className="text-default-900">Login</span>}
+              labelPlacement="outside"
+              placeholder="Enter your username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+              fullWidth
+              variant="bordered"
+            />
+            <Spacer y={5} />
+            <Input
+              label={<span className="text-default-900">Password</span>}
+              labelPlacement="outside"
+              placeholder="Enter your password"
+              name="password"
+              type={isVisible ? "text" : "password"}
+              value={formData.password}
+              onChange={handleChange}
+              required
+              fullWidth
+              variant="bordered"
+              endContent={
+                <button
+                  className="focus:outline-none"
+                  type="button"
+                  onClick={toggleVisibility}
+                  aria-label="toggle password visibility"
+                >
+                  {isVisible ? (
+                    <EyeOff className="text-2xl pointer-events-none text-default-400" />
+                  ) : (
+                    <EyeIcon className="text-2xl pointer-events-none text-default-400" />
+                  )}
+                </button>
+              }
+            />
+          </CardBody>
+
+          <CardFooter>
+            <Button
+            className="w-full"
+              type="submit"
+              color="primary"
+              fullWidth
+              endContent={<LogInIcon />}
             >
-              {isVisible ? (
-                <EyeOff className="text-2xl pointer-events-none text-default-400" />
-              ) : (
-                <EyeIcon className="text-2xl pointer-events-none text-default-400" />
-              )}
-            </button>
-          }
-        />
-        <Spacer y={1.5} />
-        <Button type="submit" color="primary" fullWidth>
-          Login
-        </Button>
-      </form>
-    </Card>
+              Login
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   );
 };
 
