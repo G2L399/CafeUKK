@@ -51,11 +51,10 @@ export default function EditMeja({
   return (
     <>
       <Button
-        className="text-xl hover:scale-110"
+        className="text-xl hover:scale-110 bg-primary-500"
         style={{
           transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
         }}
-        color="primary"
         size="lg"
         onPress={onOpen}
       >

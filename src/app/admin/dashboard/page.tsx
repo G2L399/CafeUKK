@@ -96,13 +96,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button,Image } from "@nextui-org/react";
-import { Users, CoffeeIcon, Menu, LogOut } from "lucide-react";
+import { Button, Image, Switch } from "@nextui-org/react";
+import { Users, CoffeeIcon, Menu, LogOut, Sun, Moon } from "lucide-react";
 import UserTable from "./components/User/UserTable";
 import MejaTable from "./components/Meja/MejaTable";
 import FoodTable from "./components/Menu/MenuTable";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { useTheme } from "next-themes";
 
 type TabKey = "users" | "meja" | "menu";
 
@@ -110,6 +111,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabKey>("menu");
   const [adminName, setAdminName] = useState<string>(""); // state to hold admin name
   const [userName, setuserName] = useState<string>(""); // state to hold admin name
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const handleTabChange = (key: TabKey) => {
     setActiveTab(key);
@@ -120,8 +123,12 @@ export default function AdminDashboard() {
     // Implement logout logic here
     const response = await axios.post("/api/logout");
     console.log(response.headers.location);
-    window.location.href = response.headers.location; 
-    
+    window.location.href = response.headers.location;
+  };
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+    // You would typically update your app's theme here
+    // For example: document.documentElement.classList.toggle('dark')
   };
   useEffect(() => {
     // Get the admin name from cookies
@@ -135,6 +142,10 @@ export default function AdminDashboard() {
     }
     console.log(`Admin name: ${name}`);
   }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
 
   const tabConfig = [
     { key: "users" as const, label: "Users", icon: Users },
@@ -143,11 +154,11 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="flex min-h-screen bg-default-100">
       {/* Fixed Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white p-6">
+      <aside className="w-64 p-6 text-white bg-default-100">
         <div className="flex flex-col h-full">
-          <div className="flex items-center space-x-4 mb-6">
+          <div className="flex items-center mb-6 space-x-4">
             <Image
               src={`https://api.dicebear.com/6.x/initials/svg?seed=${adminName}`}
               alt="Admin Profile"
@@ -156,23 +167,44 @@ export default function AdminDashboard() {
               height={50}
             />
             <div>
-              <h1 className="text-xl font-bold">{adminName}</h1>
-              <p className="text-sm text-gray-300">{userName}</p>
+              <h1 className="text-xl font-bold text-default-900">
+                {adminName}
+              </h1>
+              <p className="text-sm font-bold text-default-900">{userName}</p>
             </div>
           </div>
 
-          <nav className="space-y-2 flex-grow">
+          <nav className="flex-grow space-y-2">
             {tabConfig.map(({ key, label, icon: Icon }) => (
               <Button
                 key={key}
-                color={activeTab === key ? "primary" : "default"}
                 onClick={() => handleTabChange(key)}
-                className="w-full justify-start px-4"
+                className={`justify-start w-full px-4 ${
+                  activeTab === key ? "bg-primary-600" : "bg-primary-300"
+                } `}
                 startContent={<Icon size={24} className="mr-2" />}
+                variant="bordered"
               >
                 {label}
               </Button>
             ))}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {/* <Sun style={{ marginRight: 8 }} /> */}
+              <Switch
+                size="lg"
+                checked={theme === "dark"}
+                onChange={toggleTheme}
+                thumbIcon={({ isSelected, className }) =>
+                  isSelected ? (
+                    <Sun className={className} /> // Sun icon for dark mode
+                  ) : (
+                    <Moon className={className} /> // Moon icon for light mode
+                  )
+                }
+                // size="lg"
+              />
+              {/* <Moon style={{ marginLeft: 8 }} /> */}
+            </div>
           </nav>
 
           <Button
@@ -180,8 +212,8 @@ export default function AdminDashboard() {
               transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
             }}
             color="danger"
-            onClick={event => handleLogout(event)}
-            className="sticky bottom-4 w-full justify-start px-4 mt-auto hover:scale-110"
+            onClick={(event) => handleLogout(event)}
+            className="sticky justify-start w-full px-4 mt-auto bottom-4 hover:scale-110"
             startContent={<LogOut size={24} className="mr-2" />}
           >
             Log Out
@@ -190,9 +222,11 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 px-8 py-4">
-        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-        <div className="bg-gray-800 rounded-lg shadow px-6">
+      <main className="flex-1 px-8 py-4 bg-default">
+        <h1 className="mb-2 text-3xl font-bold text-default-900">
+          Admin Dashboard
+        </h1>
+        <div className="px-6 pt-6 rounded-lg shadow bg-default-200">
           {activeTab === "users" && <UserTable />}
           {activeTab === "meja" && <MejaTable />}
           {activeTab === "menu" && <FoodTable />}

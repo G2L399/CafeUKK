@@ -127,7 +127,7 @@ import {
   Pagination,
   Spinner,
 } from "@nextui-org/react";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import AddMenu from "./AddMenu";
@@ -143,6 +143,9 @@ interface Food {
 }
 
 export default function FoodTable() {
+  useEffect(() => {
+    fetchFoods();
+  }, []);
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [focusedImage, setFocusedImage] = useState<string | null>(null);
@@ -165,20 +168,13 @@ export default function FoodTable() {
       setFoods(response.data.Menu);
     } catch (error) {
       console.error("Failed to fetch foods:", error);
-      if (error instanceof AxiosError) {
-        if (error.response?.data.redirectUrl) {
-          setAccessDenied(true);
-          console.log(error.response.data.redirectUrl);
-          window.location.href = "/" + error.response?.data.redirectUrl;
-        }
-      }
+      setAccessDenied(true);
+      console.log("nigger");
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    fetchFoods();
-  }, []);
 
   const handleDelete = async (id: number) => {
     try {
@@ -212,20 +208,17 @@ export default function FoodTable() {
         <div>An Error Occurred: Either Server Side or Access Denied</div>
       ) : (
         <div className="container p-4">
-          {/* Pagination Controls */}
-          <div className="flex justify-center mb-4">
-            <Pagination
-              total={Math.ceil(foods.length / itemsPerPage)}
-              initialPage={currentPage}
-              onChange={(page) => setCurrentPage(page)}
-              page={currentPage}
-              size={"lg"}
-              showControls={true}
-              loop={true}
-              isCompact={true}
-            />
-          </div>
-          <Table aria-label="Food Menu">
+          <Table
+            isHeaderSticky
+            className="max-h-[75vh]"
+            classNames={{
+              base: "max-h-[calc(100vh-200px)] overflow-y-auto",
+              th: "bg-default-100 text-default-900 border-b border-divider",
+              td: "text-default-900 border-b border-divider",
+              thead: "text-default-900 [&>tr]:first:shadow-sm",
+            }}
+            aria-label="Food Menu"
+          >
             <TableHeader className="text-2xl text-bold">
               <TableColumn aria-label="No">NO</TableColumn>
               <TableColumn aria-label="Image">IMAGE</TableColumn>
@@ -252,7 +245,7 @@ export default function FoodTable() {
                   </TableCell>
                   <TableCell className="text-xl">
                     <div
-                      className=" relative w-44 h-44 overflow-hidden rounded-lg transition-transform duration-200 hover:scale-110"
+                      className="relative overflow-hidden transition-transform duration-200 rounded-lg w-44 h-44 hover:scale-110"
                       style={{
                         transitionTimingFunction:
                           "cubic-bezier(0.33, 1.52, 0.6, 1)",
@@ -262,15 +255,15 @@ export default function FoodTable() {
                         <Image
                           src={renderImage(food.gambar) || "/placeholder.svg"}
                           alt={food.nama_menu}
-                          className="cursor-pointer flex items-center justify-center w-full h-full object-contain"
+                          className="flex items-center justify-center w-[200px] h-[200px] overflow-hidden object-contain"
                           onClick={() =>
                             handleImageClick(renderImage(food.gambar) || "")
                           }
-                          width={200}
-                          height={200}
+                          width={200} // Ensure to set a width
+                          height={200} // Ensure to set a height
                         />
                       ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+                        <div className="flex items-center justify-center w-full h-full text-gray-500 bg-gray-200">
                           No Image
                         </div>
                       )}
@@ -288,12 +281,11 @@ export default function FoodTable() {
                     <EditMenu refreshMenus={refreshMenu} menu={food} />
                     <Spacer y={5} />
                     <Button
-                      className="text-lg hover:scale-110"
+                      className="text-lg hover:scale-110 bg-danger-500"
                       style={{
                         transitionTimingFunction:
                           "cubic-bezier(0.33, 1.52, 0.6, 1)",
                       }}
-                      color="danger"
                       size="lg"
                       onClick={() => handleDelete(food.id_menu)}
                     >

@@ -23,9 +23,9 @@ async function main() {
 
   const user3 = await prisma.user.create({
     data: {
-      nama_user: "Manajer",
-      role: "manajer",
-      username: "Manajer",
+      nama_user: "Manager",
+      role: "manager",
+      username: "Manager",
       password: "$2a$10$zvENvCggKZgNiOj5bq5RfOVDzPUTSBYEzF3B2p.0Y7qZfo1B8Zryi",
     },
   });

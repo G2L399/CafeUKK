@@ -13,6 +13,7 @@ import {
   SelectItem,
 } from "@nextui-org/react";
 import axios from "axios";
+import Image from "next/image";
 
 export default function AddMenu({
   refreshMenus,
@@ -80,13 +81,13 @@ export default function AddMenu({
   return (
     <>
       <Button
-        className="text-xl hover:scale-110"
+        className="text-xl hover:scale-110 bg-success"
         style={{
           transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
         }}
-        color="success"
         size="lg"
         onPress={onOpen}
+        variant="bordered"
       >
         Add Menu
       </Button>
@@ -120,7 +121,7 @@ export default function AddMenu({
                     {imagePreview && (
                       <>
                         <Spacer y={1} />
-                        <img
+                        <Image
                           src={imagePreview}
                           alt="Image preview"
                           style={{
@@ -128,6 +129,8 @@ export default function AddMenu({
                             maxHeight: "250px",
                             objectFit: "contain",
                           }}
+                          width={100}
+                          height={0}
                         />
                       </>
                     )}
@@ -180,7 +183,7 @@ export default function AddMenu({
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" onPress={onClose}>
                   Cancel
                 </Button>
                 <Button color="primary" onPress={handleSubmit}>

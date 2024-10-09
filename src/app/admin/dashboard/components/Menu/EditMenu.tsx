@@ -57,7 +57,7 @@ export default function EditMenu({
   ); // To store image Base64 string
 
   // Handle image file selection and conversion to Base64
-  const handleFileChange = async (e:  React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     console.log(imagePreview);
 
@@ -105,11 +105,10 @@ export default function EditMenu({
   return (
     <>
       <Button
-        className="text-lg hover:scale-110 mr-5"
+        className="mr-5 text-lg hover:scale-110 bg-primary-500"
         style={{
           transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
         }}
-        color="primary"
         size="lg"
         onPress={onOpen}
       >

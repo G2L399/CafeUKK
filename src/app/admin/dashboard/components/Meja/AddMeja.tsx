@@ -76,7 +76,7 @@ export default function AddMeja({ refreshMeja }: { refreshMeja: () => void }) {
                 <Spacer y={1} />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger"  onPress={onClose}>
                   Cancel
                 </Button>
                 <Button color="primary" onPress={handleSubmit}>

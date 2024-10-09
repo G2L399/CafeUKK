@@ -65,7 +65,7 @@ model Detail_Transaksi {
 enum Role {
   admin
   cashier
-  manajer
+  manager
 }
 
 enum Jenis {

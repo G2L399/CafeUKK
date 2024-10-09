@@ -39,7 +39,9 @@ export async function POST(req: NextRequest) {
       JWT_SECRET,
       { expiresIn: "1y" } // Token expires in 1 day
     );
-    const response = NextResponse.json({ message: "Login successful", user });
+    const response = NextResponse.redirect(
+      new URL(`/${user.role}/dashboard`, req.url)
+    );
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to secure only in production

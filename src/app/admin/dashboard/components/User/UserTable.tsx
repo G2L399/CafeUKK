@@ -68,7 +68,7 @@ export default function Component() {
     switch (role.toLowerCase()) {
       case "admin":
         return "danger";
-      case "manajer":
+      case "manager":
         return "warning";
       default:
         return "default";

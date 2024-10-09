@@ -68,11 +68,10 @@ export default function EditUser({
   return (
     <>
       <Button
-        className="hover:scale-110"
+        className="hover:scale-110 bg-primary-500"
         style={{
           transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
         }}
-        color="primary"
         size="lg"
         onPress={onOpen}
       >
@@ -112,7 +111,7 @@ export default function EditUser({
                 >
                   <SelectItem key="admin">Admin</SelectItem>
                   <SelectItem key="Cashier">Cashier</SelectItem>
-                  <SelectItem key="manajer">Manajer</SelectItem>
+                  <SelectItem key="manager">Manager</SelectItem>
                 </Select>
                 <Spacer y={1} />
                 <Input

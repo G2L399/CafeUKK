@@ -6,7 +6,7 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 interface CustomJWTPayload extends JWTPayload {
   user: {
-    role: "admin" | "cashier" | "manajer";
+    role: "admin" | "cashier" | "manager";
   };
 }
 
@@ -15,14 +15,15 @@ export async function middleware(request: NextRequest) {
 
   const token = request.cookies.get("token")?.value;
 
-  if (!token) {
+  if (!token && !request.nextUrl.pathname.startsWith("/login")) {
     console.log("No token found, redirecting to login");
-    return NextResponse.json(
-      { message: "No Token, Access Denied", redirectUrl: "login" },
-      { status: 305 }
-    );
-  }
+    console.log(request.nextUrl.pathname);
 
+    return NextResponse.redirect(new URL(`/login`, request.url));
+  }
+  if (!token && request.nextUrl.pathname.startsWith("/login")) {
+    return NextResponse.next();
+  }
   try {
     const { payload }: JWTVerifyResult = await jwtVerify(token, JWT_SECRET);
     const typedPayload = payload as CustomJWTPayload;
@@ -34,26 +35,46 @@ export async function middleware(request: NextRequest) {
     if (
       (pathname.startsWith("/api/admin") && userRole !== "admin") ||
       (pathname.startsWith("/api/cashier") && userRole !== "cashier") ||
-      (pathname.startsWith("/api/manager") && userRole !== "manajer")
+      (pathname.startsWith("/api/manager") && userRole !== "manager")
     ) {
-      console.log("Access denied, redirecting to login cashier");
-
-      return NextResponse.json(
-        { message: "Access Denied, You're not The Authorized User", redirectUrl: "login" },
-        { status: 302 }
-      );
+      console.log("Access denied, redirecting to login");
+      const response = NextResponse.redirect(new URL(`/login`, request.url));
+      response.cookies.set("token", "", { maxAge: -1 });
+      response.cookies.set("name", "", { maxAge: -1 });
+      response.cookies.set("username", "", { maxAge: -1 });
+      return response;
     }
-
+    if (
+      pathname.startsWith("/login") &&
+      Boolean(
+        userRole === "admin" || userRole === "cashier" || userRole === "manager"
+      )
+    ) {
+      const response = NextResponse.redirect(
+        new URL(`/${userRole}/dashboard`, request.url)
+      );
+      return response;
+    }
     return NextResponse.next();
   } catch (error) {
     console.error("Token verification failed:", error);
-    return NextResponse.json(
-      { message: "Error Occured", redirectUrl: "login" },
-      { status: 301 }
-    );
+    // Clear cookies and redirect to login on error
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("token", "", { maxAge: -1 });
+    response.cookies.set("name", "", { maxAge: -1 });
+    response.cookies.set("username", "", { maxAge: -1 });
+    return response;
   }
 }
 
 export const config = {
-  matcher: ["/api/admin/:path*", "/api/cashier/:path*", "/api/manager/:path*"],
+  matcher: [
+    "/api/admin/:path*",
+    "/api/cashier/:path*",
+    "/api/manager/:path*",
+    "/manager/:path*",
+    "/admin/:path*",  
+    "/cashier/:path*",
+    "/login",
+  ],
 };

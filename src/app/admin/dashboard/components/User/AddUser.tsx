@@ -22,7 +22,7 @@ export default function AddUser({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [formData, setFormData] = useState({
     nama_user: "",
-    role: "admin" || "manajer" || "Cashier",
+    role: "admin" || "manager" || "Cashier",
     username: "",
     password: "",
   });
@@ -98,7 +98,7 @@ export default function AddUser({
                 >
                   <SelectItem key="admin">Admin</SelectItem>
                   <SelectItem key="Cashier">Cashier</SelectItem>
-                  <SelectItem key="manajer">Manajer</SelectItem>
+                  <SelectItem key="manager">Manager</SelectItem>
                 </Select>
 
                 <Spacer y={1} />
@@ -119,7 +119,7 @@ export default function AddUser({
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" onPress={onClose}>
                   Cancel
                 </Button>
                 <Button color="primary" onPress={handleSubmit}>

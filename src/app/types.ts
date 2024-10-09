@@ -4,7 +4,7 @@ import { User as NextAuthUser } from 'next-auth';
 interface User extends NextAuthUser {
   id: string;
   username: string;
-  role: 'admin' | 'Cashier' | 'manajer';
+  role: 'admin' | 'Cashier' | 'manager';
 }
 
 export default User;

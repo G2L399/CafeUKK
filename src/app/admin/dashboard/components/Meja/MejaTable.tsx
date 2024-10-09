@@ -102,6 +102,7 @@ const MejaTable = () => {
       </Table>
       <Spacer y={5} />
       <AddMeja refreshMeja={fetchMeja} />
+      <Spacer y={5}></Spacer>
     </div>
   );
 };

@@ -2,7 +2,7 @@
 CREATE TABLE `User` (
     `id_user` INTEGER NOT NULL AUTO_INCREMENT,
     `nama_user` VARCHAR(191) NOT NULL,
-    `role` ENUM('admin', 'Cashier', 'manajer') NOT NULL,
+    `role` ENUM('admin', 'Cashier', 'manager') NOT NULL,
     `username` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
 
