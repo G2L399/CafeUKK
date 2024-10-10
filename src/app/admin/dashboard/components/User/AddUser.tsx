@@ -12,6 +12,7 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
+import { EyeIcon, EyeOff } from "lucide-react";
 import axios from "axios";
 import bcrypt from "bcryptjs";
 export default function AddUser({
@@ -20,13 +21,23 @@ export default function AddUser({
   refreshUsers: () => void;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     nama_user: "",
-    role: "admin" || "manager" || "Cashier",
+    role: "admin" || "manager" || "cashier",
     username: "",
     password: "",
   });
-  const handlePasswordChange = async (e: any) => {
+  const initialFormData = {
+    nama_user: "",
+    role: "admin", // You can change this to whichever role you'd prefer as the default
+    username: "",
+    password: "",
+  };
+
+  const handlePasswordChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const newPassword = e.target.value;
 
     if (newPassword) {
@@ -46,6 +57,7 @@ export default function AddUser({
   const handleSubmit = async () => {
     try {
       await axios.post("/api/admin/User/addUser", formData);
+      setFormData(initialFormData);
       refreshUsers(); // Refresh user data after adding
       onOpenChange(); // Close modal
     } catch (error) {
@@ -92,12 +104,13 @@ export default function AddUser({
                   label="Role"
                   placeholder="Select role"
                   defaultSelectedKeys={["admin"]}
-                  onSelectionChange={(key: any) =>
-                    setFormData({ ...formData, role: key.currentKey })
-                  }
+                  onSelectionChange={(key) => {
+                    const currentKey = Array.from(key)[0] as string;
+                    setFormData({ ...formData, role: currentKey });
+                  }}
                 >
                   <SelectItem key="admin">Admin</SelectItem>
-                  <SelectItem key="Cashier">Cashier</SelectItem>
+                  <SelectItem key="cashier">Cashier</SelectItem>
                   <SelectItem key="manager">Manager</SelectItem>
                 </Select>
 
@@ -112,10 +125,23 @@ export default function AddUser({
                 />
                 <Spacer y={1} />
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   label="Password"
                   placeholder="Enter password"
                   onChange={handlePasswordChange}
+                  endContent={
+                    <Button
+                      isIconOnly
+                      className="bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="text-2xl pointer-events-none text-default-900"></EyeOff>
+                      ) : (
+                        <EyeIcon className="text-2xl pointer-events-none text-default-900"></EyeIcon>
+                      )}
+                    </Button>
+                  }
                 />
               </ModalBody>
               <ModalFooter>

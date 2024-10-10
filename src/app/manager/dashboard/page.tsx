@@ -23,6 +23,7 @@ import {
   SelectItem,
   Spacer,
 } from "@nextui-org/react";
+import { LogOut } from "lucide-react";
 
 export interface User {
   id_user: number;
@@ -211,12 +212,22 @@ export default function ManagerDashboard() {
     setDetailTransaksi(item.Detail_Transaksi);
     onOpen();
   };
+  const handleLogout = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
+    // Implement logout logic here
+    const response = await axios.post("/api/logout");
+    console.log(response.headers.location);
+    window.location.href = response.headers.location;
+  };
+
   return (
     <div className="w-full h-full px-10 py-5 overflow-hidden bg-default-50">
       <div className="flex items-center justify-between mb-4">
         <div className="flex justify-between">
           <div>
-            <label htmlFor="startDate"><pre>Start Date</pre></label>
+            <label htmlFor="startDate">
+              <pre>Start Date</pre>
+            </label>
             <input
               onChange={(e) => {
                 setstartDate(e.target.value);
@@ -238,7 +249,9 @@ export default function ManagerDashboard() {
           </div>
           <Spacer x={5}></Spacer>
           <div>
-            <label htmlFor="endDate"><pre>End Date</pre></label>
+            <label htmlFor="endDate">
+              <pre>End Date</pre>
+            </label>
             <input
               onChange={(e) => {
                 setendDate(e.target.value);
@@ -336,7 +349,11 @@ export default function ManagerDashboard() {
                     })}
                   </TableCell>
                   <TableCell>
-                    <Button size="lg" onClick={() => handleOpenModal(item)}>
+                    <Button
+                      size="lg"
+                      className="bg-default-300"
+                      onClick={() => handleOpenModal(item)}
+                    >
                       VIEW DETAILS
                     </Button>
                   </TableCell>
@@ -446,6 +463,17 @@ export default function ManagerDashboard() {
           )}
         </ModalContent>
       </Modal>
+      <Button
+        style={{
+          transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
+        }}
+        color="danger"
+        onClick={(event) => handleLogout(event)}
+        className="sticky justify-start w-full px-4 mt-auto bottom-4 hover:scale-110"
+        startContent={<LogOut size={24} className="mr-2" />}
+      >
+        Log Out
+      </Button>
     </div>
   );
 }

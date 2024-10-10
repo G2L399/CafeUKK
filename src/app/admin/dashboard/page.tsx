@@ -222,7 +222,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 px-8 py-4 bg-default">
+      <main className="flex-1 px-8 py-4 bg-default-50">
         <h1 className="mb-2 text-3xl font-bold text-default-900">
           Admin Dashboard
         </h1>

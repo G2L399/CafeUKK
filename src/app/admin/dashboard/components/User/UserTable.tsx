@@ -12,6 +12,7 @@ import {
   User,
   Chip,
   SortDescriptor,
+  Spinner,
 } from "@nextui-org/react";
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
@@ -91,7 +92,7 @@ export default function Component() {
 
   return (
     <div className="container p-4">
-      <h1 className="text-2xl font-bold mb-4">User Management</h1>
+      <h1 className="mb-4 text-2xl font-bold">User Management</h1>
       <Table
         aria-label="User table"
         className="mb-4"
@@ -114,11 +115,16 @@ export default function Component() {
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
         <TableBody
-          emptyContent={loading ? "Loading users..." : "No users found"}
-          loadingContent={
-            <div className="h-12 bg-default-100 rounded animate-pulse" />
+          emptyContent={
+            loading ? (
+              <>
+                <Spinner aria-label="loading" />
+                <div>Loading...</div>
+              </>
+            ) : (
+              <span className="text-xl">No data available</span>
+            )
           }
-          loadingState={loading ? "loading" : "idle"}
           items={sortedUsers}
         >
           {(item) => (
@@ -144,14 +150,14 @@ export default function Component() {
               </TableCell>
               <TableCell>
                 <Chip color={roleColor(item.role)} variant="light">
-                  <h1 className="text-xl uppercase">{item.role}</h1>
+                  <h1 className="text-xl uppercase stroke-black">
+                    {item.role}
+                  </h1>
                 </Chip>
               </TableCell>
-              <TableCell style={{ width: "25%" }} className="text-xl">
-                {item.username}
-              </TableCell>
+              <TableCell className="text-xl">{item.username}</TableCell>
               <TableCell className="text-xl">
-                <div className="w-3/4 flex items-center gap-5">
+                <div className="flex items-center w-3/4 gap-5">
                   <EditUser user={item} refreshUsers={refreshUsers} />
                   <Button
                     className="hover:scale-110"

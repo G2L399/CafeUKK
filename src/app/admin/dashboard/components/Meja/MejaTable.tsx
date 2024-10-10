@@ -7,7 +7,7 @@ import {
   TableCell,
   Button,
   Spacer,
-  Spinner
+  Spinner,
 } from "@nextui-org/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -45,17 +45,17 @@ const MejaTable = () => {
       <Table aria-label="table">
         <TableHeader aria-label="table header">
           <TableColumn aria-label="NO">NO</TableColumn>
-          <TableColumn aria-label="ID">ID</TableColumn>
           <TableColumn aria-label="NOMOR MEJA">NOMOR MEJA</TableColumn>
           <TableColumn aria-label="ACTIONS">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody
           aria-label="table body"
           emptyContent={
-            loading ? (<>
-            <Spinner aria-label="loading" />
-              <span className="text-xl">loading...</span>
-            </>
+            loading ? (
+              <>
+                <Spinner aria-label="loading" />
+                <div>Loading...</div>
+              </>
             ) : (
               <span className="text-xl">No data available</span>
             )
@@ -66,12 +66,8 @@ const MejaTable = () => {
               <TableCell aria-label="NO" className="text-xl">
                 {meja.indexOf(item) + 1}
               </TableCell>
-              <TableCell aria-label="ID" className="text-xl">
-                {item.id_meja}
-              </TableCell>
               <TableCell
                 style={{
-                  width: "500px",
                   wordBreak: "break-all",
                   whiteSpace: "normal",
                 }}
@@ -80,9 +76,9 @@ const MejaTable = () => {
               >
                 {item.nomor_meja}
               </TableCell>
-              <TableCell aria-label="DELETE" className="text-xl">
+              <TableCell aria-label="DELETE" className="flex text-xl">
                 <EditMeja Meja={item} refreshMeja={fetchMeja} />
-                <Spacer y={5} />
+                <Spacer x={5} />
                 <Button
                   className="text-lg hover:scale-110"
                   style={{
@@ -93,7 +89,7 @@ const MejaTable = () => {
                   size="lg"
                   onClick={() => handleDelete(item.id_meja)}
                 >
-                  Delete Meja With ID {item.id_meja}
+                  Delete Meja
                 </Button>
               </TableCell>
             </TableRow>

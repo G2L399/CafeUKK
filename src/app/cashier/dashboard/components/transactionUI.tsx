@@ -139,7 +139,6 @@ export default function TransactionUI() {
       await axios
         .get("/api/cashier/transaction/getMenu")
         .then((response) => setMenus(response.data.Menu));
-      console.log(menus);
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error("Error fetching menus:", error.message);
@@ -168,7 +167,6 @@ export default function TransactionUI() {
       const existingItemIndex = prevCart.findIndex(
         (item) => item.id_menu === menu.id_menu
       );
-      console.log(existingItemIndex);
       if (existingItemIndex !== -1) {
         //item exists already
         const updatedCart = [...prevCart];

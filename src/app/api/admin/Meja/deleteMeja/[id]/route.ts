@@ -18,7 +18,7 @@ export async function DELETE(
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to delete Meja" },
+      { error: "Failed to delete Meja", message: error },
       { status: 500 }
     );
   }

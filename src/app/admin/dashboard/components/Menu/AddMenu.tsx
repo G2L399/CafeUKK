@@ -31,8 +31,8 @@ export default function AddMenu({
   const [imageBase64, setImageBase64] = useState<string | null>(null); // To store image Base64 string
 
   // Handle image file selection and conversion to Base64
-  const handleFileChange = async (e: any) => {
-    const file = e.target.files[0];
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       // Preview the image
       const reader = new FileReader();
@@ -76,7 +76,6 @@ export default function AddMenu({
       console.error("Failed to add menu:", error);
     }
   };
- 
 
   return (
     <>
@@ -87,7 +86,6 @@ export default function AddMenu({
         }}
         size="lg"
         onPress={onOpen}
-        variant="bordered"
       >
         Add Menu
       </Button>
@@ -116,8 +114,8 @@ export default function AddMenu({
                         cursor: "pointer",
                       }}
                     />
-                    
-                    <Spacer x={5}/>
+
+                    <Spacer x={5} />
                     {imagePreview && (
                       <>
                         <Spacer y={1} />
@@ -149,9 +147,10 @@ export default function AddMenu({
                       label="Type"
                       placeholder="Select type"
                       defaultSelectedKeys={["Food"]}
-                      onSelectionChange={(key: any) =>
-                        setFormData({ ...formData, jenis: key.currentKey })
-                      }
+                      onSelectionChange={(key) => {
+                        const currentKey = Array.from(key)[0] as string;
+                        setFormData({ ...formData, jenis: currentKey });
+                      }}
                     >
                       <SelectItem key="Food">Food</SelectItem>
                       <SelectItem key="Beverage">Beverage</SelectItem>

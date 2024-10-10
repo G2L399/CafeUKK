@@ -22,7 +22,7 @@ export async function PUT(
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to update Meja" },
+      { error: "Failed to update Meja", message: error },
       { status: 500 }
     );
   }

@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET; // Store this in environment variable
 export async function POST(req: NextRequest) {
   const { username, password } = await req.json();
   console.log("Username:", username, "Password:", password);
-  
+
   if (!JWT_SECRET) {
     return NextResponse.json(
       { error: "JWT Secret is not defined in environment variables" },
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     if (!isMatch) {
       return NextResponse.json(
-        { error: "Invalid credentials" },
+        { message: "Invalid credentials" },
         { status: 401 }
       );
     }
@@ -55,19 +55,20 @@ export async function POST(req: NextRequest) {
       maxAge: 24 * 60 * 60,
       sameSite: "strict",
       path: "/",
-    })
+    });
     response.cookies.set("username", user.username, {
       httpOnly: false, // Set to false if you want to access it on the client side
       secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60,
       sameSite: "strict",
       path: "/",
-    })
+    });
+
     return response;
   } catch (error) {
     console.error("Error during login:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }

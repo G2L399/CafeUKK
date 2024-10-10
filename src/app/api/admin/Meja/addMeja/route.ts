@@ -17,6 +17,9 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    return NextResponse.json({ error: "Failed to add Table" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to add Table", message: error },
+      { status: 500 }
+    );
   }
 }

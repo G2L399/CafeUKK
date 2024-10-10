@@ -36,10 +36,9 @@ const LoginPage = () => {
       const response = await axios.post("/api/login", formData);
 
       if (response.status === 200) {
-        console.log(response);
-
-        alert(response.data.message);
+        alert("Login successful");
         // Redirect or handle successful login here
+        window.location.reload();
       }
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -94,25 +93,25 @@ const LoginPage = () => {
               fullWidth
               variant="bordered"
               endContent={
-                <button
-                  className="focus:outline-none"
-                  type="button"
+                <Button
+                  className="bg-transparent"
+                  isIconOnly
                   onClick={toggleVisibility}
                   aria-label="toggle password visibility"
                 >
                   {isVisible ? (
-                    <EyeOff className="text-2xl pointer-events-none text-default-400" />
+                    <EyeOff className="text-2xl pointer-events-none text-default-900" />
                   ) : (
-                    <EyeIcon className="text-2xl pointer-events-none text-default-400" />
+                    <EyeIcon className="text-2xl pointer-events-none text-default-900" />
                   )}
-                </button>
+                </Button>
               }
             />
           </CardBody>
 
           <CardFooter>
             <Button
-            className="w-full"
+              className="w-full"
               type="submit"
               color="primary"
               fullWidth

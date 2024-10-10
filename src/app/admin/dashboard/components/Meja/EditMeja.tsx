@@ -58,7 +58,7 @@ export default function EditMeja({
         size="lg"
         onPress={onOpen}
       >
-        Edit Meja With ID {Meja.id_meja}
+        Edit Meja
       </Button>
       <Modal
         isOpen={isOpen}

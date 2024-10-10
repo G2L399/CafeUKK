@@ -53,8 +53,13 @@ export async function POST(req: NextRequest) {
   });
 
   // Create detail transactions for each item in the cart
+  interface Item {
+    id_menu: number;
+    quantity: number;
+    total_harga: number;
+  }
   await Promise.all(
-    cart.map((item: any) => {
+    cart.map((item: Item) => {
       console.log(item.total_harga);
       return prisma.detail_Transaksi.create({
         data: {

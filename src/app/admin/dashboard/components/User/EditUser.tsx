@@ -36,7 +36,9 @@ export default function EditUser({
   useEffect(() => {
     setFormData(user); // Reset form data when user prop changes
   }, [user]);
-  const handlePasswordChange = async (e: any) => {
+  const handlePasswordChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const newPassword = e.target.value;
 
     if (newPassword) {
@@ -76,7 +78,7 @@ export default function EditUser({
         onPress={onOpen}
       >
         <Edit />
-        <h1 className="text-xl">Edit {formData.nama_user} User</h1>
+        <h1 className="text-xl">Edit User</h1>
       </Button>
       <Modal
         isOpen={isOpen}
@@ -105,12 +107,14 @@ export default function EditUser({
                   label="Role"
                   placeholder="Select role"
                   defaultSelectedKeys={[formData.role]}
-                  onSelectionChange={(key: any) =>
-                    setFormData({ ...formData, role: key.currentKey })
-                  }
+                  onSelectionChange={(key) => {
+                    console.log(key);
+                    const currentKey = Array.from(key)[0] as string; // Convert the set to array and get the first item
+                    setFormData({ ...formData, role: currentKey });
+                  }}
                 >
                   <SelectItem key="admin">Admin</SelectItem>
-                  <SelectItem key="Cashier">Cashier</SelectItem>
+                  <SelectItem key="cashier">Cashier</SelectItem>
                   <SelectItem key="manager">Manager</SelectItem>
                 </Select>
                 <Spacer y={1} />

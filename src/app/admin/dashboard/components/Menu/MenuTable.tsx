@@ -126,6 +126,8 @@ import {
   Spacer,
   Pagination,
   Spinner,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -151,14 +153,14 @@ export default function FoodTable() {
   const [focusedImage, setFocusedImage] = useState<string | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [accessDenied, setAccessDenied] = useState(false);
-
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Set the maximum number of items per page
   // Calculate the data for the current page
-  const indexOfLastFood = currentPage * itemsPerPage;
-  const indexOfFirstFood = indexOfLastFood - itemsPerPage;
+  const indexOfLastFood = currentPage * rowsPerPage;
+  const indexOfFirstFood = indexOfLastFood - rowsPerPage;
   const currentFoods = foods.slice(indexOfFirstFood, indexOfLastFood);
+
   const refreshMenu = () => {
     fetchFoods();
   };
@@ -194,7 +196,10 @@ export default function FoodTable() {
     setFocusedImage(imageSrc);
     onOpen();
   };
-
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setRowsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
   function formatToRupiah(value: number): string {
     return new Intl.NumberFormat("en-EN", {
       style: "currency",
@@ -207,10 +212,37 @@ export default function FoodTable() {
       {accessDenied ? (
         <div>An Error Occurred: Either Server Side or Access Denied</div>
       ) : (
-        <div className="container p-4">
+        <div className="container">
+          <Select
+            label={<span className="text-default-900">Rows Per Page</span>}
+            labelPlacement="outside"
+            defaultSelectedKeys={["10"]}
+            value={rowsPerPage}
+            onChange={handleRowsPerPageChange}
+            className="w-40 "
+            classNames={{
+              base: "text-default-900",
+              listbox: "text-default-900",
+            }}
+            disallowEmptySelection
+          >
+            <SelectItem key={5} value="5">
+              5
+            </SelectItem>
+            <SelectItem key={10} value="10">
+              10
+            </SelectItem>
+            <SelectItem key={20} value="20">
+              20
+            </SelectItem>
+            <SelectItem key={50} value="50">
+              50
+            </SelectItem>
+          </Select>
+          <Spacer y={5}></Spacer>
           <Table
             isHeaderSticky
-            className="max-h-[75vh]"
+            className="max-h-[70vh]"
             classNames={{
               base: "max-h-[calc(100vh-200px)] overflow-y-auto",
               th: "bg-default-100 text-default-900 border-b border-divider",
@@ -255,7 +287,7 @@ export default function FoodTable() {
                         <Image
                           src={renderImage(food.gambar) || "/placeholder.svg"}
                           alt={food.nama_menu}
-                          className="flex items-center justify-center w-[200px] h-[200px] overflow-hidden object-contain"
+                          className="flex items-center justify-center w-[200px] h-[200px] overflow-hidden object-contain cursor-pointer"
                           onClick={() =>
                             handleImageClick(renderImage(food.gambar) || "")
                           }
@@ -330,7 +362,7 @@ export default function FoodTable() {
             {/* Pagination Controls */}
             <div className="flex justify-center mb-4">
               <Pagination
-                total={Math.ceil(foods.length / itemsPerPage)}
+                total={Math.ceil(foods.length / rowsPerPage)}
                 initialPage={currentPage}
                 onChange={(page) => setCurrentPage(page)}
                 page={currentPage}

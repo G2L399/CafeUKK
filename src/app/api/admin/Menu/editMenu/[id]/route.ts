@@ -2,8 +2,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
   const { nama_menu, jenis, deskripsi, gambar, harga } = await req.json();
 
   try {
@@ -18,8 +21,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       },
     });
 
-    return NextResponse.json({ message: "Menu updated successfully", updatedMenu });
+    return NextResponse.json({
+      message: "Menu updated successfully",
+      updatedMenu,
+    });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update menu" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update menu", message: error },
+      { status: 500 }
+    );
   }
 }

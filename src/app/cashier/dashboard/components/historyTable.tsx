@@ -184,13 +184,10 @@ export default function HistoryTable() {
   };
   const handleOpenModal = (item: Transaksi) => {
     setSelectedTransaksi(item);
-    console.log(item.Detail_Transaksi);
     setDetailTransaksi(item.Detail_Transaksi);
     onOpen();
   };
-  const handleExportPDF = (items: Array<Detail_Transaksi>) => {
-    console.log(items);
-
+  const handleExportPDF = (items: Detail_Transaksi[]) => {
     const doc = new jsPDF();
     doc.text(`Transaction ID: ${selectedTransaksi?.id_transaksi}`, 10, 10);
 
@@ -201,7 +198,9 @@ export default function HistoryTable() {
       doc.text(`Quantity: ${item.jumlah}`, 10, y);
       y += 10;
       doc.text(
-        `Total Price: ${item.total_harga.toLocaleString("en-EN", {
+        `Total Price Of ${
+          item.Menu.nama_menu
+        }: ${item.total_harga.toLocaleString("en-EN", {
           style: "currency",
           currency: "IDR",
           notation: "compact",
@@ -224,6 +223,8 @@ export default function HistoryTable() {
     );
     y += 10;
     doc.text(`Customer Name: ${selectedTransaksi?.nama_pelanggan}`, 10, y);
+    y += 10;
+    doc.text(`Cashier Name: ${selectedTransaksi?.User.nama_user}`, 10, y);
     doc.save(`transaction_${selectedTransaksi?.id_transaksi}.pdf`);
   };
   return (
@@ -319,18 +320,6 @@ export default function HistoryTable() {
                 </TableCell>
                 <TableCell className="text-md">
                   {item.status.toLocaleUpperCase()}
-                  <Button
-                    color="primary"
-                    onClick={() => {
-                      Promise.resolve(changestatus(item.id_transaksi)).then(
-                        () => {
-                          fetchTransaksi();
-                        }
-                      );
-                    }}
-                  >
-                    change lol
-                  </Button>
                 </TableCell>
                 <TableCell className="text-md">
                   {item.total_harga.toLocaleString("en-EN", {
@@ -339,9 +328,27 @@ export default function HistoryTable() {
                     notation: "compact",
                   })}
                 </TableCell>
-                <TableCell>
-                  <Button size="lg" onClick={() => handleOpenModal(item)}>
-                    VIEW DETAILS
+                <TableCell className="flex flex-row">
+                  <Button
+                    className="bg-default-300 "
+                    size="lg"
+                    onClick={() => handleOpenModal(item)}
+                  >
+                    <span className="font-bold">VIEW DETAILS</span>
+                  </Button>
+                  <Spacer x={5}></Spacer>
+                  <Button
+                    className="bg-default-300 "
+                    size="lg"
+                    onClick={() => {
+                      Promise.resolve(changestatus(item.id_transaksi)).then(
+                        () => {
+                          fetchTransaksi();
+                        }
+                      );
+                    }}
+                  >
+                    CHANGE STATUS
                   </Button>
                 </TableCell>
               </TableRow>
@@ -377,7 +384,6 @@ export default function HistoryTable() {
                       <TableColumn allowsSorting key="total_harga">
                         Total Price
                       </TableColumn>
-                      <TableColumn>Export</TableColumn>
                     </TableHeader>
                     <TableBody items={sortedDetail}>
                       {(item) => {
@@ -401,14 +407,6 @@ export default function HistoryTable() {
                                 notation: "compact",
                               })}
                             </TableCell>
-                            <TableCell>
-                              <Button
-                                className="text-md bg-primary-400"
-                                onPress={() => handleExportPDF(sortedDetail)}
-                              >
-                                Export
-                              </Button>
-                            </TableCell>
                           </TableRow>
                         );
                       }}
@@ -416,7 +414,13 @@ export default function HistoryTable() {
                   </Table>
                 )}
               </ModalBody>
-              <ModalFooter>
+              <ModalFooter className="flex justify-between">
+                <Button
+                  className="text-md bg-primary-400"
+                  onPress={() => handleExportPDF(sortedDetail)}
+                >
+                  Export
+                </Button>
                 <Button className="text-md bg-danger-400" onPress={onClose}>
                   Close
                 </Button>

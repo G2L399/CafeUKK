@@ -13,7 +13,7 @@ import "@/app/globals.css";
 type TabKey = "transaction" | "history";
 
 export default function CashierDashboard() {
-  const [activeTab, setActiveTab] = useState<TabKey>("transaction");
+  const [activeTab, setActiveTab] = useState<TabKey>("history");
   const [CashierName, setCashierName] = useState<string>(""); // state to hold cashier name
   const [userName, setuserName] = useState<string>(""); // state to hold cashier name
   const [mounted, setMounted] = useState(false);
@@ -25,8 +25,15 @@ export default function CashierDashboard() {
 
   const handleLogout = async () => {
     // Implement logout logic here
-    const response = await axios.get("/api/logout");
-    console.log(response);
+    try {
+      const response = await axios.post("/api/logout");
+      if (response.status === 200) {
+        alert(response.data.message);
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Error Loggin Out:", error);
+    }
   };
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -50,7 +57,6 @@ export default function CashierDashboard() {
     setMounted(true);
   }, []);
   if (!mounted) return null;
-
 
   const tabConfig = [
     { key: "transaction" as const, label: "transaction", icon: CreditCard },
@@ -82,15 +88,14 @@ export default function CashierDashboard() {
             {tabConfig.map(({ key, label, icon: Icon }) => (
               <Button
                 key={key}
+                isIconOnly={activeTab ? true : false}
                 color={activeTab === key ? "primary" : "default"}
                 onClick={() => handleTabChange(key)}
-                className="justify-start w-full px-4 border border-primary-900"
-                // startContent={<Icon size={24} className="mr-2" />}
+                className={`justify-start w-full px-4 ${
+                  activeTab === key ? "bg-primary-600" : "bg-primary-300"
+                } `}
+                startContent={<Icon size={24} className="mr-2" />}
               >
-                <span className="block">
-                  {/* Only show this on small screens */}
-                  <Icon size={24} />
-                </span>
                 <span className="block">{label}</span>
                 {/* Only show this on larger screens */}
               </Button>
