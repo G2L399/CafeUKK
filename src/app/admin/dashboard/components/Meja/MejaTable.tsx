@@ -72,7 +72,7 @@ const MejaTable = () => {
                   whiteSpace: "normal",
                 }}
                 aria-label="NOMOR MEJA"
-                className="text-xl"
+                className="text-xl w-auto max-w-72"
               >
                 {item.nomor_meja}
               </TableCell>

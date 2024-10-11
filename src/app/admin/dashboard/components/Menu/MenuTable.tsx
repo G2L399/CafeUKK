@@ -277,7 +277,7 @@ export default function FoodTable() {
                   </TableCell>
                   <TableCell className="text-xl">
                     <div
-                      className="relative overflow-hidden transition-transform duration-200 rounded-lg w-44 h-44 hover:scale-110"
+                      className="flex items-center justify-center relative w-[auto] h-[auto] py-7"
                       style={{
                         transitionTimingFunction:
                           "cubic-bezier(0.33, 1.52, 0.6, 1)",
@@ -287,12 +287,12 @@ export default function FoodTable() {
                         <Image
                           src={renderImage(food.gambar) || "/placeholder.svg"}
                           alt={food.nama_menu}
-                          className="flex items-center justify-center w-[200px] h-[200px] overflow-hidden object-contain cursor-pointer"
+                          className="w-[100%] h-[auto] overflow-hidden transition-transform duration-200 object-contain cursor-pointer hover:scale-110 max-w-44 outline-4 outline-black outline-none outline-offset-0"
                           onClick={() =>
                             handleImageClick(renderImage(food.gambar) || "")
                           }
-                          width={200} // Ensure to set a width
-                          height={200} // Ensure to set a height
+                          width={0} // Ensure to set a width
+                          height={0} // Ensure to set a height
                         />
                       ) : (
                         <div className="flex items-center justify-center w-full h-full text-gray-500 bg-gray-200">
@@ -303,7 +303,7 @@ export default function FoodTable() {
                   </TableCell>
                   <TableCell className="text-xl">{food.nama_menu}</TableCell>
                   <TableCell className="text-xl">{food.jenis}</TableCell>
-                  <TableCell className="text-xl w-72">
+                  <TableCell className="w-auto text-xl max-w-72">
                     {food.deskripsi || "N/A"}
                   </TableCell>
                   <TableCell className="text-xl">
@@ -327,14 +327,13 @@ export default function FoodTable() {
                 </TableRow>
               ))}
             </TableBody>
+
           </Table>
 
           <Modal
             isOpen={isOpen}
             onClose={onClose}
             size="xl"
-            isDismissable={false}
-            isKeyboardDismissDisabled={true}
             backdrop="blur"
           >
             <ModalContent>
@@ -343,23 +342,25 @@ export default function FoodTable() {
               </ModalHeader>
               <ModalBody>
                 {focusedImage && (
-                  <Image
-                    src={focusedImage}
-                    alt="Focused food image"
-                    width={800}
-                    height={600}
-                    layout="responsive"
-                    objectFit="contain"
-                  />
+                  <div className="pb-4">
+                    <Image
+                      src={focusedImage}
+                      className="outline-none outline-4 outline-black outline-offset-0"
+                      alt="Focused food image"
+                      width={800}
+                      height={600}
+                      layout="responsive"
+                      objectFit="contain"
+                    />
+                  </div>
                 )}
               </ModalBody>
             </ModalContent>
           </Modal>
 
           <Spacer y={5} />
-          <div className="flex justify-between">
+          <div className="flex justify-between pb-3">
             <AddMenu refreshMenus={refreshMenu} />
-            {/* Pagination Controls */}
             <div className="flex justify-center mb-4">
               <Pagination
                 total={Math.ceil(foods.length / rowsPerPage)}

@@ -127,9 +127,11 @@ export default function AdminDashboard() {
   };
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
-    // You would typically update your app's theme here
-    // For example: document.documentElement.classList.toggle('dark')
   };
+  useEffect(() => {
+    setTheme(localStorage.getItem("theme") as string);
+    console.log(localStorage.getItem("theme"));
+  }, [setTheme]);
   useEffect(() => {
     // Get the admin name from cookies
     const name = Cookies.get("name"); // Assuming you set this cookie on successful login
@@ -178,9 +180,14 @@ export default function AdminDashboard() {
             {tabConfig.map(({ key, label, icon: Icon }) => (
               <Button
                 key={key}
+                style={{
+                  transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
+                }}
                 onClick={() => handleTabChange(key)}
                 className={`justify-start w-full px-4 ${
-                  activeTab === key ? "bg-primary-600" : "bg-primary-300"
+                  activeTab === key
+                    ? "bg-primary-600"
+                    : "bg-primary-300 hover:scale-110 ease-custom-animation"
                 } `}
                 startContent={<Icon size={24} className="mr-2" />}
                 variant="bordered"
@@ -189,21 +196,19 @@ export default function AdminDashboard() {
               </Button>
             ))}
             <div style={{ display: "flex", alignItems: "center" }}>
-              {/* <Sun style={{ marginRight: 8 }} /> */}
               <Switch
                 size="lg"
-                checked={theme === "dark"}
+                isSelected={theme === "light"}
+                color="secondary"
                 onChange={toggleTheme}
                 thumbIcon={({ isSelected, className }) =>
                   isSelected ? (
-                    <Sun className={className} /> // Sun icon for dark mode
+                    <Sun className={className} /> // Sun icon for light mode
                   ) : (
-                    <Moon className={className} /> // Moon icon for light mode
+                    <Moon className={`${className}`} /> // Moon icon for dark mode
                   )
                 }
-                // size="lg"
               />
-              {/* <Moon style={{ marginLeft: 8 }} /> */}
             </div>
           </nav>
 

@@ -80,7 +80,7 @@ export default function AddMenu({
   return (
     <>
       <Button
-        className="text-xl hover:scale-110 bg-success"
+        className="text-xl tran hover:scale-110 bg-success"
         style={{
           transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
         }}

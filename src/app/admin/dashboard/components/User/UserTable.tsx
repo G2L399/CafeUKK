@@ -70,7 +70,7 @@ export default function Component() {
       case "admin":
         return "danger";
       case "manager":
-        return "warning";
+        return "success";
       default:
         return "default";
     }
@@ -95,7 +95,6 @@ export default function Component() {
       <h1 className="mb-4 text-2xl font-bold">User Management</h1>
       <Table
         aria-label="User table"
-        className="mb-4"
         sortDescriptor={sortDescriptor}
         onSortChange={handleSortChange}
       >
@@ -132,7 +131,7 @@ export default function Component() {
               <TableCell className="text-xl">
                 {users.indexOf(item) + 1}
               </TableCell>
-              <TableCell>
+              <TableCell className="w-auto max-w-10">
                 <User
                   name={<h1 className="text-xl">{item.nama_user}</h1>}
                   description={
@@ -143,19 +142,18 @@ export default function Component() {
                     style: {
                       width: "3.5rem",
                       height: "3.5rem",
-                      marginRight: "1rem",
                     },
                   }}
                 />
               </TableCell>
-              <TableCell>
-                <Chip color={roleColor(item.role)} variant="light">
-                  <h1 className="text-xl uppercase stroke-black">
+              <TableCell className="w-auto max-w-10">
+                <Chip color={roleColor(item.role)} variant="dot">
+                  <h1 className="text-xl uppercase">
                     {item.role}
                   </h1>
                 </Chip>
               </TableCell>
-              <TableCell className="text-xl">{item.username}</TableCell>
+              <TableCell className="text-xl w-auto max-w-72">{item.username}</TableCell>
               <TableCell className="text-xl">
                 <div className="flex items-center w-3/4 gap-5">
                   <EditUser user={item} refreshUsers={refreshUsers} />

@@ -6,7 +6,7 @@ This is a Next.js project for managing a cafe. It includes features such as menu
 
 To get started with the project, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/G@L399/cafeukk.git`
+1. Clone the repository: `git clone https://github.com/G2L399/cafeukk.git`
 2. Install dependencies: `npm install` or `yarn install`
 3. Start the development server: `npm run dev` or `yarn dev`
 4. Open the application in your browser: `http://localhost:3000`
