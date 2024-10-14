@@ -84,6 +84,8 @@ export default function HistoryTable() {
     try {
       setLoading(true);
       const response = await axios.get("/api/cashier/transaction/getTransaksi");
+      console.log(response);
+
       setTransaksi(response.data.Transaksi);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -337,19 +339,23 @@ export default function HistoryTable() {
                     <span className="font-bold">VIEW DETAILS</span>
                   </Button>
                   <Spacer x={5}></Spacer>
-                  <Button
-                    className="bg-default-300 "
-                    size="lg"
-                    onClick={() => {
-                      Promise.resolve(changestatus(item.id_transaksi)).then(
-                        () => {
-                          fetchTransaksi();
-                        }
-                      );
-                    }}
-                  >
-                    CHANGE STATUS
-                  </Button>
+                  {item.status.toLowerCase() === "belum_bayar" ? (
+                    <Button
+                      className="bg-default-300 "
+                      size="lg"
+                      onClick={() => {
+                        Promise.resolve(changestatus(item.id_transaksi)).then(
+                          () => {
+                            fetchTransaksi();
+                          }
+                        );
+                      }}
+                    >
+                      LUNASKAN
+                    </Button>
+                  ) : (
+                    <></>
+                  )}
                 </TableCell>
               </TableRow>
             )}
@@ -415,12 +421,16 @@ export default function HistoryTable() {
                 )}
               </ModalBody>
               <ModalFooter className="flex justify-between">
-                <Button
-                  className="text-md bg-primary-400"
-                  onPress={() => handleExportPDF(sortedDetail)}
-                >
-                  Export
-                </Button>
+                {selectedTransaksi?.status.toLowerCase() === "belum_bayar" ? (
+                  <></>
+                ) : (
+                  <Button
+                    className="text-md bg-primary-400"
+                    onPress={() => handleExportPDF(sortedDetail)}
+                  >
+                    Export
+                  </Button>
+                )}
                 <Button className="text-md bg-danger-400" onPress={onClose}>
                   Close
                 </Button>

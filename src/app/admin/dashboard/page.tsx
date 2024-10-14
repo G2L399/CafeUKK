@@ -187,7 +187,7 @@ export default function AdminDashboard() {
                 className={`justify-start w-full px-4 ${
                   activeTab === key
                     ? "bg-primary-600"
-                    : "bg-primary-300 hover:scale-110 ease-custom-animation"
+                    : "bg-primary-300 hover:scale-110 "
                 } `}
                 startContent={<Icon size={24} className="mr-2" />}
                 variant="bordered"

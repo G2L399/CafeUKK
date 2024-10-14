@@ -3,13 +3,14 @@ import type { NextRequest } from "next/server";
 import { JWTPayload, jwtVerify, JWTVerifyResult } from "jose";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
-
 interface CustomJWTPayload extends JWTPayload {
   user: {
     role: "admin" | "cashier" | "manager";
   };
 }
-
+type RolePaths = {
+  [key in CustomJWTPayload["user"]["role"]]: string[];
+};
 export async function middleware(request: NextRequest) {
   console.log("Middleware triggered");
 
@@ -24,6 +25,7 @@ export async function middleware(request: NextRequest) {
   if (!token && request.nextUrl.pathname.startsWith("/login")) {
     return NextResponse.next();
   }
+  if (!token) throw new Error("Token is undefined or empty");
   try {
     const { payload }: JWTVerifyResult = await jwtVerify(token, JWT_SECRET);
     const typedPayload = payload as CustomJWTPayload;
@@ -32,29 +34,41 @@ export async function middleware(request: NextRequest) {
 
     console.log(`User Role: ${userRole}, Pathname: ${pathname}`);
 
-    if (
-      (pathname.startsWith("/api/admin") && userRole !== "admin") ||
-      (pathname.startsWith("/api/cashier") && userRole !== "cashier") ||
-      (pathname.startsWith("/api/manager") && userRole !== "manager")
-    ) {
-      console.log("Access denied, redirecting to login");
-      const response = NextResponse.redirect(new URL(`/login`, request.url));
-      response.cookies.set("token", "", { maxAge: -1 });
-      response.cookies.set("name", "", { maxAge: -1 });
-      response.cookies.set("username", "", { maxAge: -1 });
-      return response;
-    }
+    const rolePaths: RolePaths = {
+      admin: ["/api/admin", "/admin/"],
+      cashier: ["/api/cashier", "/cashier/"],
+      manager: ["/api/manager", "/manager/"],
+    };
+
+    const isPathRestricted = (role: CustomJWTPayload["user"]["role"]) => {
+      return rolePaths[role].some((path) => pathname.startsWith(path));
+    };
     if (
       pathname.startsWith("/login") &&
       Boolean(
         userRole === "admin" || userRole === "cashier" || userRole === "manager"
       )
     ) {
+      console.log(
+        "You've Already Logged In, Redirecting To Your Dashboard... [" +
+          userRole +
+          "]"
+      );
+
       const response = NextResponse.redirect(
         new URL(`/${userRole}/dashboard`, request.url)
       );
       return response;
     }
+    if (!isPathRestricted(userRole)) {
+      console.log(
+        "Access denied, redirecting to your dashboard [" + userRole + "]"
+      );
+      return NextResponse.redirect(
+        new URL(`/${userRole}/dashboard`, request.url)
+      );
+    }
+
     return NextResponse.next();
   } catch (error) {
     console.error("Token verification failed:", error);
@@ -73,7 +87,7 @@ export const config = {
     "/api/cashier/:path*",
     "/api/manager/:path*",
     "/manager/:path*",
-    "/admin/:path*",  
+    "/admin/:path*",
     "/cashier/:path*",
     "/login",
   ],

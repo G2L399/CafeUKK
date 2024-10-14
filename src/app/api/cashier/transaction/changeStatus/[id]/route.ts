@@ -13,8 +13,5 @@ export async function POST(
       status: "lunas",
     },
   });
-//   console.log(berhasil);
-
-  console.log(changed);
   return NextResponse.json({ message: "yay", changed });
 }

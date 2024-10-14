@@ -34,7 +34,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post("/api/login", formData);
-
+      
       if (response.status === 200) {
         alert("Login successful");
         // Redirect or handle successful login here
