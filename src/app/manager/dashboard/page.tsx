@@ -237,15 +237,6 @@ export default function ManagerDashboard() {
               type="datetime-local"
               name="startDate"
             />
-            {/* <Button
-              size="sm"
-              className="ml-2"
-              onClick={() => {
-                setstartDate("");
-              }}
-            >
-              Clear
-            </Button> */}
           </div>
           <Spacer x={5}></Spacer>
           <div>
@@ -261,29 +252,40 @@ export default function ManagerDashboard() {
               type="datetime-local"
               name="endDate"
             />
-            {/* <Button
-              size="sm"
-              className="ml-2"
-              onClick={() => {
-                setendDate("");
-              }}
-            >
-              Clear
-            </Button> */}
           </div>
         </div>
-
         <div className="flex justify-center">
-          <Pagination
-            total={Math.ceil(DateFiltered.length / rowsPerPage)}
-            page={page}
-            onChange={handlePageChange}
-            loop
-            showControls
-          />
+          <Select
+            label={<span className="text-default-900">Rows Per Page</span>}
+            labelPlacement="outside"
+            defaultSelectedKeys={["10"]}
+            value={rowsPerPage}
+            onChange={handleRowsPerPageChange}
+            className="w-40 "
+            classNames={{
+              base: "text-default-900",
+              listbox: "text-default-900",
+            }}
+            disallowEmptySelection
+          >
+            <SelectItem key={5} value="5">
+              5
+            </SelectItem>
+            <SelectItem key={10} value="10">
+              10
+            </SelectItem>
+            <SelectItem key={20} value="20">
+              20
+            </SelectItem>
+            <SelectItem key={50} value="50">
+              50
+            </SelectItem>
+          </Select>
         </div>
       </div>
+
       <Spacer y={5}></Spacer>
+
       <div className="overflow-hidden ">
         <Table
           isHeaderSticky
@@ -363,32 +365,27 @@ export default function ManagerDashboard() {
           </TableBody>
         </Table>
         <Spacer y={5}></Spacer>
-        <Select
-          label={<span className="text-default-900">Rows Per Page</span>}
-          labelPlacement="outside"
-          defaultSelectedKeys={["10"]}
-          value={rowsPerPage}
-          onChange={handleRowsPerPageChange}
-          className="w-40 "
-          classNames={{
-            base: "text-default-900",
-            listbox: "text-default-900",
+      </div>
+      <div className="flex justify-between">
+        <Button
+          style={{
+            transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
           }}
-          disallowEmptySelection
+          color="danger"
+          onClick={(event) => handleLogout(event)}
+          className="sticky justify-start w-auto px-4 mt-auto bottom-4 hover:scale-110 "
+          startContent={<LogOut size={24} className="mr-2" />}
         >
-          <SelectItem key={5} value="5">
-            5
-          </SelectItem>
-          <SelectItem key={10} value="10">
-            10
-          </SelectItem>
-          <SelectItem key={20} value="20">
-            20
-          </SelectItem>
-          <SelectItem key={50} value="50">
-            50
-          </SelectItem>
-        </Select>
+          Log Out
+        </Button>
+        <Pagination
+          total={Math.ceil(DateFiltered.length / rowsPerPage)}
+          initialPage={page}
+          page={page}
+          onChange={handlePageChange}
+          loop
+          showControls
+        />
       </div>
       <Spacer y={5}></Spacer>
       <Modal backdrop="blur" isOpen={isOpen} onClose={onClose} size="2xl">
@@ -463,17 +460,6 @@ export default function ManagerDashboard() {
           )}
         </ModalContent>
       </Modal>
-      <Button
-        style={{
-          transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
-        }}
-        color="danger"
-        onClick={(event) => handleLogout(event)}
-        className="sticky justify-start w-full px-4 mt-auto bottom-4 hover:scale-110"
-        startContent={<LogOut size={24} className="mr-2" />}
-      >
-        Log Out
-      </Button>
     </div>
   );
 }

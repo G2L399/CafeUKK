@@ -376,6 +376,10 @@ export default function HistoryTable() {
                     aria-label="Transaction details table"
                     sortDescriptor={sortDetailDescriptor}
                     onSortChange={handleDetailSortChange}
+                    classNames={{
+                      th: "border-b border-divider",
+                      td: "border-b border-divider",
+                    }}
                   >
                     <TableHeader>
                       <TableColumn allowsSorting key="no">

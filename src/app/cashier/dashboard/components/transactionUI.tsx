@@ -9,7 +9,6 @@ import {
   CardFooter,
   CardHeader,
   Input,
-  Image,
   Select,
   SelectItem,
   Spacer,
@@ -25,7 +24,7 @@ import {
 } from "@nextui-org/react";
 import { Minus, Plus, Search, X } from "lucide-react";
 import React from "react";
-
+import Image from "next/image";
 interface Menu {
   id_menu: number;
   nama_menu: string;
@@ -116,7 +115,10 @@ export default function TransactionUI() {
       if (first === undefined && second === undefined) return 0;
       if (first === undefined) return 1; // Treat undefined as greater than any defined value
       if (second === undefined) return -1; // Treat defined values as less than undefined
-      if (sortDescriptor.column === "nama_menu") {
+      if (sortDescriptor.column === "no") {
+        first = filteredMenus.indexOf(a) + 1;
+        second = filteredMenus.indexOf(b) + 1;
+      } else if (sortDescriptor.column === "nama_menu") {
         first = (first as string).toLowerCase();
         second = (second as string).toLowerCase();
       }
@@ -275,8 +277,8 @@ export default function TransactionUI() {
   };
 
   return (
-    <div className="flex flex-col gap-4 px-4 md:flex-row">
-      <div className="w-full space-y-4 md:w-3/4">
+    <div className=" flex flex-col w-auto lg:flex-row gap-4 px-4">
+      <div className="w-full space-y-4 ">
         <div className="flex items-end justify-start mb-4 space-x-2">
           <Input
             type="text"
@@ -353,21 +355,24 @@ export default function TransactionUI() {
           </Select>
           <div></div>
         </div>
+        
         <Table
           aria-label="Menu items table"
           sortDescriptor={sortDescriptor}
           className="max-h-[70vh]"
           classNames={{
             base: "max-h-[calc(100vh-200px)] overflow-y-auto",
-            th: "bg-default-100 text-default-700 border-b border-divider",
-            td: "text-default-900 border-b-[5px] border-divider",
+            th: " bg-default-100 text-default-700 border-b border-divider",
+            td: "text-lg text-default-900 border-b-[5px] border-divider",
             thead: "[&>tr]:first:shadow-sm",
           }}
           onSortChange={handleSortChange}
           isCompact
         >
           <TableHeader>
-            <TableColumn key="no">No</TableColumn>
+            <TableColumn allowsSorting key="no">
+              No
+            </TableColumn>
             <TableColumn key="gambar">Gambar</TableColumn>
             <TableColumn allowsSorting key="nama_menu">
               Name
@@ -392,9 +397,11 @@ export default function TransactionUI() {
                 <TableCell>{menus.indexOf(item) + 1}</TableCell>
                 <TableCell>
                   <Image
-                    className="max-w-[17.5rem]"
+                    className="w-auto max-w-[14rem] dark:outline-none outline outline-offset-0 outline-black m-2"
                     alt={item.nama_menu}
-                    src={renderImage(item.gambar)}
+                    src={renderImage(item.gambar) as string}
+                    width={0}
+                    height={0}
                   />
                 </TableCell>
                 <TableCell>{item.nama_menu}</TableCell>
@@ -422,7 +429,8 @@ export default function TransactionUI() {
           <Pagination
             className="h-full"
             total={Math.ceil(filteredMenus.length / rowsPerPage)}
-            page={page}
+            // page={page}
+            initialPage={page}
             onChange={handlePageChange}
             loop
             showControls
@@ -464,8 +472,8 @@ export default function TransactionUI() {
           </Button>
         </div>
       </div>
-      <div className="w-full mt-4 md:w-1/4 md:mt-0 text-default-900">
-        <Input
+      <div className="w-full lg:w-4/12 text-default-900">
+      <Input
           type="text"
           value={CartQuery}
           onChange={(e) => setCartQuery(e.target.value)}
@@ -478,7 +486,7 @@ export default function TransactionUI() {
           }
         />
         <Spacer y={4}></Spacer>
-        <Card className="sticky top-5 text-default-900">
+        <Card className="sticky text-default-900 ">
           <CardHeader>
             <h2 className="text-lg font-bold">Cart</h2>
           </CardHeader>

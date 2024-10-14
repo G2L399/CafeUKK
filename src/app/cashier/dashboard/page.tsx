@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Switch } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { CreditCard, Receipt, LogOut, Moon, Sun } from "lucide-react";
 import Cookies from "js-cookie";
 import Image from "next/image";
@@ -13,7 +13,7 @@ import "@/app/globals.css";
 type TabKey = "transaction" | "history";
 
 export default function CashierDashboard() {
-  const [activeTab, setActiveTab] = useState<TabKey>("history");
+  const [activeTab, setActiveTab] = useState<TabKey>("transaction");
   const [CashierName, setCashierName] = useState<string>(""); // state to hold cashier name
   const [userName, setuserName] = useState<string>(""); // state to hold cashier name
   const [mounted, setMounted] = useState(false);
@@ -37,8 +37,6 @@ export default function CashierDashboard() {
   };
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
-    // You would typically update your app's theme here
-    // For example: document.documentElement.classList.toggle('dark')
   };
   useEffect(() => {
     // Get the cashier name from cookies
@@ -56,6 +54,10 @@ export default function CashierDashboard() {
   useEffect(() => {
     setMounted(true);
   }, []);
+  useEffect(() => {
+    setTheme(localStorage.getItem("theme") as string);
+    console.log(localStorage.getItem("theme"));
+  }, [setTheme]);
   if (!mounted) return null;
 
   const tabConfig = [
@@ -66,9 +68,9 @@ export default function CashierDashboard() {
   return (
     <div className="flex min-h-screen bg-black">
       {/* Fixed Sidebar */}
-      <aside className="w-16 p-6 text-default-900 bg-default-50 lg:w-64 md:w-52 sm:w-32">
+      <aside className=" p-6 text-default-900 bg-default-50 lg:w-64 md:w-52 w-32">
         <div className="flex flex-col h-full">
-          <div className="flex items-center mb-6 space-x-4">
+          <div className="flex items-center mb-6 md:space-x-4 flex-wrap">
             <Image
               src={`https://api.dicebear.com/6.x/initials/svg?seed=${CashierName}`}
               alt="Cashier Profile"
@@ -88,35 +90,30 @@ export default function CashierDashboard() {
             {tabConfig.map(({ key, label, icon: Icon }) => (
               <Button
                 key={key}
-                isIconOnly={activeTab ? true : false}
                 color={activeTab === key ? "primary" : "default"}
                 onClick={() => handleTabChange(key)}
-                className={`justify-start w-full px-4 ${
+                className={`font-bold uppercase justify-start w-auto md:w-full px-4 ${
                   activeTab === key ? "bg-primary-600" : "bg-primary-300"
                 } `}
                 startContent={<Icon size={24} className="mr-2" />}
               >
-                <span className="block">{label}</span>
-                {/* Only show this on larger screens */}
+                <span className="hidden md:block">{label}</span>
               </Button>
             ))}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              {/* <Sun style={{ marginRight: 8 }} /> */}
-              <Switch
-                size="lg"
-                checked={theme === "dark"}
-                onChange={toggleTheme}
-                thumbIcon={({ isSelected, className }) =>
-                  isSelected ? (
-                    <Sun className={className} /> // Sun icon for dark mode
-                  ) : (
-                    <Moon className={className} /> // Moon icon for light mode
-                  )
-                }
-                // size="lg"
-              />
-              {/* <Moon style={{ marginLeft: 8 }} /> */}
-            </div>
+            <Button
+              onClick={toggleTheme}
+              className="font-bold uppercase w-auto md:w-full p-2 bg-primary-300 transition-all duration-300"
+              aria-label="Toggle theme"
+            >
+              <span className="hidden md:block text-white dark:text-black">
+                Toggle theme: {theme === "light" ? "Light" : "Dark"}
+              </span>
+              {theme === "light" ? (
+                <Sun className=" text-white" /> // Sun icon for light mode
+              ) : (
+                <Moon className=" text-black" /> // Moon icon for dark mode
+              )}
+            </Button>
           </nav>
 
           <Button
@@ -138,7 +135,7 @@ export default function CashierDashboard() {
         <h1 className="mb-2 text-3xl font-bold text-default-900">
           Cashier Dashboard
         </h1>
-        <div className="p-6 rounded-lg shadow bg-default-200">
+        <div className=" p-6 rounded-lg shadow bg-default-200">
           {activeTab === "transaction" && <TransactionUI />}
           {activeTab === "history" && <HistoryTable />}
         </div>

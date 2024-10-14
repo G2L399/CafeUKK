@@ -96,7 +96,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Image, Switch } from "@nextui-org/react";
+import { Button, Image } from "@nextui-org/react";
 import { Users, CoffeeIcon, Menu, LogOut, Sun, Moon } from "lucide-react";
 import UserTable from "./components/User/UserTable";
 import MejaTable from "./components/Meja/MejaTable";
@@ -195,21 +195,20 @@ export default function AdminDashboard() {
                 {label}
               </Button>
             ))}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Switch
-                size="lg"
-                isSelected={theme === "light"}
-                color="secondary"
-                onChange={toggleTheme}
-                thumbIcon={({ isSelected, className }) =>
-                  isSelected ? (
-                    <Sun className={className} /> // Sun icon for light mode
-                  ) : (
-                    <Moon className={`${className}`} /> // Moon icon for dark mode
-                  )
-                }
-              />
-            </div>
+            <Button
+              onClick={toggleTheme}
+              className="font-bold uppercase w-auto md:w-full p-2 bg-primary-600  transition-all duration-300"
+              aria-label="Toggle theme"
+            >
+              <span className="hidden md:block text-white dark:text-black">
+                Toggle theme: {theme === "light" ? "Light" : "Dark"}
+              </span>
+              {theme === "light" ? (
+                <Sun className=" text-white" /> // Sun icon for light mode
+              ) : (
+                <Moon className=" text-black" /> // Moon icon for dark mode
+              )}
+            </Button>
           </nav>
 
           <Button
