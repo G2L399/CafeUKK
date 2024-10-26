@@ -16,15 +16,7 @@ import {
   Image,
 } from "@nextui-org/react";
 import axios from "axios";
-interface Menu {
-  id_menu: number;
-  nama_menu: string;
-  jenis: "Food" | "Beverage";
-  deskripsi: string;
-  gambar: string | null;
-  harga: number;
-  date_added: string | Date;
-}
+import { Menu } from "@/lib/types";
 export default function EditMenu({
   refreshMenus,
   menu,
@@ -40,8 +32,8 @@ export default function EditMenu({
     harga: menu.harga,
     gambar: menu.gambar,
   });
-  const formatBase64Image = (base64: string | null): string | null => {
-    if (!base64) return null;
+  const formatBase64Image = (base64: string | undefined): string | undefined => {
+    if (!base64) return undefined;
     // Check if the string already has the data URL prefix
     if (base64.startsWith("data:image")) {
       return base64;
@@ -49,10 +41,10 @@ export default function EditMenu({
     // If not, assume it's a JPEG and prepend the necessary prefix
     return `data:image/jpeg;base64,${base64}`;
   };
-  const [imagePreview, setImagePreview] = useState<string | null>(
+  const [imagePreview, setImagePreview] = useState<string | undefined>(
     formatBase64Image(formData.gambar) // Call the function to format the base64 string
   ); // To store image preview
-  const [imageBase64, setImageBase64] = useState<string | null>(
+  const [imageBase64, setImageBase64] = useState<string | undefined>(
     formData.gambar
   ); // To store image Base64 string
 

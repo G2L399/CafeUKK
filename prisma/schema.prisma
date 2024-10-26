@@ -14,7 +14,7 @@ generator client {
 }
 
 model User {
-  id_user   Int         @id @default(autoincrement())
+  id_user   String      @id @default(uuid())
   nama_user String
   role      Role
   username  String
@@ -26,8 +26,8 @@ model Menu {
   id_menu          Int                @id @default(autoincrement())
   nama_menu        String
   jenis            Jenis
-  deskripsi        String?
-  gambar           String?            @db.LongText
+  deskripsi        String
+  gambar           String             @db.LongText
   harga            Int
   date_added       DateTime           @default(now())
   Detail_Transaksi Detail_Transaksi[]
@@ -40,21 +40,21 @@ model Meja {
 }
 
 model Transaksi {
-  id_transaksi   Int      @id @default(autoincrement())
-  tgl_transaksi  DateTime @default(now())
-  id_user        Int
-  id_meja        Int
-  nama_pelanggan String
-  status         Status
-  total_harga    Int 
+  id_transaksi     String             @id @default(uuid())
+  tgl_transaksi    DateTime           @default(now())
+  id_user          String
+  id_meja          Int
+  nama_pelanggan   String
+  status           Status
+  total_harga      Int
   User             User               @relation(fields: [id_user], references: [id_user])
   Meja             Meja               @relation(fields: [id_meja], references: [id_meja])
   Detail_Transaksi Detail_Transaksi[]
 }
 
 model Detail_Transaksi {
-  id_detail_transaksi Int       @id @default(autoincrement())
-  id_transaksi        Int
+  id_detail_transaksi String    @id @default(uuid())
+  id_transaksi        String
   id_menu             Int
   jumlah              Int
   total_harga         Int
@@ -63,17 +63,17 @@ model Detail_Transaksi {
 }
 
 enum Role {
-  admin
-  cashier
-  manager
+  Admin
+  Cashier
+  Manager
 }
 
 enum Jenis {
-  Food
-  Beverage
+  Foods
+  Drinks
 }
 
 enum Status {
-  belum_bayar
-  lunas
+  Unpaid
+  Paid
 }

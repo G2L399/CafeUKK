@@ -15,14 +15,7 @@ import {
 import axios from "axios";
 import bcrypt from "bcryptjs";
 import { Edit } from "lucide-react";
-
-interface User {
-  id_user: number;
-  nama_user: string;
-  username: string;
-  password: string;
-  role: string;
-}
+import { User,Role } from "@/lib/types";
 export default function EditUser({
   user,
   refreshUsers,
@@ -106,11 +99,11 @@ export default function EditUser({
                 <Select
                   label="Role"
                   placeholder="Select role"
-                  defaultSelectedKeys={[formData.role]}
+                  defaultSelectedKeys={[formData.role.role]}
                   onSelectionChange={(key) => {
                     console.log(key);
-                    const currentKey = Array.from(key)[0] as string; // Convert the set to array and get the first item
-                    setFormData({ ...formData, role: currentKey });
+                    const currentKey = Array.from(key)[0] as unknown as Role; // Convert the set to array and get the first item
+                    setFormData({ ...formData, role: currentKey as Role });
                   }}
                 >
                   <SelectItem key="admin">Admin</SelectItem>

@@ -9,24 +9,19 @@ import {
   TableCell,
   Button,
   Spacer,
-  User,
+  User as Users,
   Chip,
   SortDescriptor,
   Spinner,
 } from "@nextui-org/react";
+import { toast, Toaster } from "react-hot-toast";
+
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Trash2 } from "lucide-react";
 import EditUser from "./EditUser";
 import AddUser from "./AddUser";
-
-interface User {
-  id_user: number;
-  nama_user: string;
-  role: string;
-  username: string;
-  password: string;
-}
+import { Role, User } from "@/lib/types";
 
 export default function Component() {
   const [users, setUsers] = useState<User[]>([]);
@@ -56,17 +51,26 @@ export default function Component() {
     fetchUsers();
   }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
       await axios.delete(`/api/admin/User/deleteUser/${id}`);
       setUsers(users.filter((user) => user.id_user !== id));
     } catch (error) {
-      console.error("Error deleting user:", error);
+      if (error instanceof AxiosError) {
+        console.error("Error deleting user:", error.response?.data.error);
+        if (error.response?.status === 400) {
+          toast.error("You Cannot Delete Yourself!");
+        } else {
+          toast.error(
+            "An error occurred while deleting the user. Please try again."
+          );
+        }
+      }
     }
   };
 
-  const roleColor = (role: string) => {
-    switch (role.toLowerCase()) {
+  const roleColor = (role: Role) => {
+    switch (role.role.toLowerCase()) {
       case "admin":
         return "danger";
       case "manager":
@@ -92,6 +96,7 @@ export default function Component() {
 
   return (
     <div className="container p-4">
+      <Toaster position="top-right" />
       <h1 className="mb-4 text-2xl font-bold">User Management</h1>
       <Table
         aria-label="User table"
@@ -132,7 +137,7 @@ export default function Component() {
                 {users.indexOf(item) + 1}
               </TableCell>
               <TableCell className="w-auto max-w-10">
-                <User
+                <Users
                   name={<h1 className="text-xl">{item.nama_user}</h1>}
                   description={
                     <span className="text-lg">ID: {item.id_user}</span>
@@ -148,12 +153,12 @@ export default function Component() {
               </TableCell>
               <TableCell className="w-auto max-w-10">
                 <Chip color={roleColor(item.role)} variant="dot">
-                  <h1 className="text-xl uppercase">
-                    {item.role}
-                  </h1>
+                  <h1 className="text-xl uppercase">{item.role.role}</h1>
                 </Chip>
               </TableCell>
-              <TableCell className="text-xl w-auto max-w-72">{item.username}</TableCell>
+              <TableCell className="text-xl w-auto max-w-72">
+                {item.username}
+              </TableCell>
               <TableCell className="text-xl">
                 <div className="flex items-center w-3/4 gap-5">
                   <EditUser user={item} refreshUsers={refreshUsers} />

@@ -25,19 +25,7 @@ import {
 import { Minus, Plus, Search, X } from "lucide-react";
 import React from "react";
 import Image from "next/image";
-interface Menu {
-  id_menu: number;
-  nama_menu: string;
-  jenis: "Food" | "Beverage";
-  deskripsi: string;
-  gambar?: string;
-  harga: number;
-  date_added?: string | Date;
-}
-interface Meja {
-  id_meja: number;
-  nomor_meja: string;
-}
+import { Menu,Meja } from "@/lib/types";
 interface CartItem extends Menu {
   quantity: number;
   total_harga: number;
@@ -57,7 +45,7 @@ export default function TransactionUI() {
   const [CartQuery, setCartQuery] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [idmeja, setIdmeja] = useState<number>(0);
-  const [filterType, setFilterType] = useState<"All" | "Food" | "Beverage">(
+  const [filterType, setFilterType] = useState<"All" | "Food" | "Drinks">(
     "All"
   );
 
@@ -112,9 +100,9 @@ export default function TransactionUI() {
     return [...filteredMenus].sort((a, b) => {
       let first = a[sortDescriptor.column as keyof Menu];
       let second = b[sortDescriptor.column as keyof Menu];
-      if (first === undefined && second === undefined) return 0;
-      if (first === undefined) return 1; // Treat undefined as greater than any defined value
-      if (second === undefined) return -1; // Treat defined values as less than undefined
+      if ((first === undefined || null) && (second === undefined || null)) return 0;
+      if (first === undefined || null) return 1; // Treat undefined as greater than any defined value
+      if (second === undefined || null) return -1; // Treat defined values as less than undefined
       if (sortDescriptor.column === "no") {
         first = filteredMenus.indexOf(a) + 1;
         second = filteredMenus.indexOf(b) + 1;
@@ -133,6 +121,7 @@ export default function TransactionUI() {
     }
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
+    
     return sortedMenu.slice(start, end);
   }, [sortedMenu, page, rowsPerPage]);
   const fetchMenus = async () => {
@@ -160,7 +149,7 @@ export default function TransactionUI() {
   };
 
   const renderImage = (base64String?: string) => {
-    if (!base64String) return undefined;
+    if (!base64String) return null;
     return `data:image/jpeg;base64,${base64String}`;
   };
 
@@ -177,10 +166,10 @@ export default function TransactionUI() {
           ...existingItem,
           quantity: existingItem.quantity + 1,
           total_harga: existingItem.harga * (existingItem.quantity + 1),
+          date_added: new Date(),
         };
         return updatedCart;
       } else {
-        //item doen't exist already
         return [
           ...prevCart,
           {
@@ -191,6 +180,7 @@ export default function TransactionUI() {
             nama_menu: menu.nama_menu,
             quantity: 1,
             total_harga: menu.harga,
+            date_added: new Date(),
           },
         ];
       }
@@ -243,7 +233,7 @@ export default function TransactionUI() {
         });
 
       localStorage.removeItem("cart");
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response) {
           // Server responded with a status other than 2xx
@@ -265,9 +255,8 @@ export default function TransactionUI() {
 
   const clearCart = () => {
     setCart([]);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    localStorage.setItem("cart", []);
+
+    localStorage.setItem("cart", JSON.stringify([]));
   };
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -302,7 +291,7 @@ export default function TransactionUI() {
           <Select
             value={filterType}
             onChange={(e) =>
-              setFilterType(e.target.value as "All" | "Food" | "Beverage")
+              setFilterType(e.target.value as "All" | "Food" | "Drinks")
             }
             defaultSelectedKeys={["All"]}
             className="w-full md:w-1/4 text-default-900"
@@ -320,8 +309,8 @@ export default function TransactionUI() {
             <SelectItem key="Food" value="Food">
               Food
             </SelectItem>
-            <SelectItem key="Beverage" value="Beverage">
-              Beverage
+            <SelectItem key="Drinks" value="Drinks">
+              Drinks
             </SelectItem>
           </Select>
           <Select
@@ -359,6 +348,7 @@ export default function TransactionUI() {
         <Table
           aria-label="Menu items table"
           sortDescriptor={sortDescriptor}
+          onSortChange={handleSortChange}
           className="max-h-[70vh]"
           classNames={{
             base: "max-h-[calc(100vh-200px)] overflow-y-auto",
@@ -366,7 +356,7 @@ export default function TransactionUI() {
             td: "text-lg text-default-900 border-b-[5px] border-divider",
             thead: "[&>tr]:first:shadow-sm",
           }}
-          onSortChange={handleSortChange}
+          
           isCompact
         >
           <TableHeader>
@@ -459,6 +449,8 @@ export default function TransactionUI() {
                       harga: menu.harga,
                       quantity: 1,
                       total_harga: menu.harga,
+                      gambar: undefined,
+                      date_added: new Date(),
                     });
                   }
                   return acc;

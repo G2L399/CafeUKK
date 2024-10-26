@@ -25,41 +25,7 @@ import {
 } from "@nextui-org/react";
 import { LogOut } from "lucide-react";
 
-export interface User {
-  id_user: number;
-  nama_user: string;
-  password: string;
-  role: string;
-  username: string;
-}
-export interface Transaksi {
-  id_transaksi: number;
-  tgl_transaksi: string;
-  nama_pelanggan: string;
-  status: string;
-  total_harga: number;
-  Detail_Transaksi: Detail_Transaksi[];
-  User: User; // Add the User interface here
-}
-export interface Detail_Transaksi extends Transaksi {
-  Menu: Menu;
-  jumlah: number;
-  total_harga: number;
-}
-export interface Menu {
-  id_menu: number;
-  nama_menu: string;
-  jenis: Jenis; // Assuming `Jenis` is an enum or another type
-  deskripsi?: string;
-  gambar?: string; // Representing the LONGBLOB as a base64 string or URL if required
-  harga: number;
-  date_added: Date;
-}
-export enum Jenis {
-  FOOD = "FOOD",
-  BEVERAGE = "BEVERAGE",
-  // Add more as needed
-}
+import { Detail_Transaksi, Transaksi } from "@/lib/types";
 
 export default function ManagerDashboard() {
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);

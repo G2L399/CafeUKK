@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                   transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
                 }}
                 onClick={() => handleTabChange(key)}
-                className={`justify-start w-full px-4 ${
+                className={`dark:text-black font-bold uppercase text-white justify-start w-full px-4  ${
                   activeTab === key
                     ? "bg-primary-600"
                     : "bg-primary-300 hover:scale-110 "
@@ -196,8 +196,11 @@ export default function AdminDashboard() {
               </Button>
             ))}
             <Button
+              style={{
+                transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
+              }}
               onClick={toggleTheme}
-              className="font-bold uppercase w-auto md:w-full p-2 bg-primary-600  transition-all duration-300"
+              className="font-bold uppercase w-auto md:w-full p-2 bg-primary-600  transition-all duration-300 hover:scale-110"
               aria-label="Toggle theme"
             >
               <span className="hidden md:block text-white dark:text-black">

@@ -12,10 +12,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import axios from "axios";
-interface Meja {
-  id_meja: number;
-  nomor_meja: string;
-}
+import { Meja } from "@/lib/types";
 export default function EditMeja({
   Meja,
   refreshMeja,

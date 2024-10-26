@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { JWTPayload, jwtVerify, JWTVerifyResult } from "jose";
+import {  jwtVerify, JWTVerifyResult } from "jose";
+import { CustomJWTPayload } from "@/lib/types";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
-interface CustomJWTPayload extends JWTPayload {
-  user: {
-    role: "admin" | "cashier" | "manager";
-  };
-}
 type RolePaths = {
   [key in CustomJWTPayload["user"]["role"]]: string[];
 };

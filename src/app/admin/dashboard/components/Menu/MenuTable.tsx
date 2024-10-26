@@ -128,21 +128,14 @@ import {
   Spinner,
   Select,
   SelectItem,
+  SortDescriptor,
 } from "@nextui-org/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import AddMenu from "./AddMenu";
 import EditMenu from "./EditMenu";
-interface Food {
-  id_menu: number;
-  nama_menu: string;
-  jenis: "Food" | "Beverage";
-  deskripsi: string;
-  gambar: string;
-  harga: number;
-  date_added: string | Date;
-}
+import { Menu as Food } from "@/lib/types";
 
 export default function FoodTable() {
   useEffect(() => {
@@ -156,10 +149,11 @@ export default function FoodTable() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  // Calculate the data for the current page
-  const indexOfLastFood = currentPage * rowsPerPage;
-  const indexOfFirstFood = indexOfLastFood - rowsPerPage;
-  const currentFoods = foods.slice(indexOfFirstFood, indexOfLastFood);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "name",
+    direction: "ascending",
+  });
+
 
   const refreshMenu = () => {
     fetchFoods();
@@ -178,6 +172,9 @@ export default function FoodTable() {
     }
   };
 
+  const handleSortChange = (descriptor: SortDescriptor) => {
+    setSortDescriptor(descriptor);
+  };
   const handleDelete = async (id: number) => {
     try {
       await axios.delete(`/api/admin/Menu/deleteMenu/${id}`);
@@ -207,6 +204,34 @@ export default function FoodTable() {
       notation: "scientific",
     }).format(value);
   }
+  const sortedFood = useMemo(() => {
+    
+    return [...foods].sort((a, b) => {
+      let first = a[sortDescriptor.column as keyof Food];
+      let second = b[sortDescriptor.column as keyof Food];
+      if (first === undefined && second === undefined) return 0;
+      if (first === undefined) return 1; // Treat undefined as greater than any defined value
+      if (second === undefined) return -1; // Treat defined values as less than undefined
+      if (sortDescriptor.column === "no") {
+        first = foods.indexOf(a) + 1;
+        second = foods.indexOf(b) + 1;
+      }
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+      console.log(sortDescriptor.column);
+      
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [foods, sortDescriptor]);
+
+  const currentFoods = useMemo(() => {
+    if (rowsPerPage === sortedFood.length) {
+      return sortedFood;
+    }
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    
+    return sortedFood.slice(start, end);
+  }, [sortedFood, currentPage, rowsPerPage]);
   return (
     <>
       {accessDenied ? (
@@ -241,6 +266,8 @@ export default function FoodTable() {
           </Select>
           <Spacer y={5}></Spacer>
           <Table
+            sortDescriptor={sortDescriptor}
+            onSortChange={handleSortChange}
             isHeaderSticky
             className="max-h-[70vh]"
             classNames={{
@@ -252,12 +279,16 @@ export default function FoodTable() {
             aria-label="Food Menu"
           >
             <TableHeader className="text-2xl text-bold">
-              <TableColumn aria-label="No">NO</TableColumn>
+              <TableColumn allowsSorting key="no" aria-label="No">
+                NO
+              </TableColumn>
               <TableColumn aria-label="Image">IMAGE</TableColumn>
-              <TableColumn aria-label="Name">NAME</TableColumn>
+              <TableColumn allowsSorting key="name" aria-label="Name">
+                NAME
+              </TableColumn>
               <TableColumn aria-label="Type">TYPE</TableColumn>
               <TableColumn aria-label="Description">DESCRIPTION</TableColumn>
-              <TableColumn aria-label="Price">PRICE</TableColumn>
+              <TableColumn allowsSorting aria-label="Price">PRICE</TableColumn>
               <TableColumn aria-label="Actions">ACTIONS</TableColumn>
             </TableHeader>
             <TableBody
@@ -268,12 +299,13 @@ export default function FoodTable() {
                   <div>Loading...</div>
                 </div>
               }
+              items={currentFoods}
               loadingState={loading ? "loading" : "idle"}
             >
-              {currentFoods.map((food) => (
-                <TableRow key={food.id_menu}>
+              {(item) => (
+                <TableRow key={item.id_menu}>
                   <TableCell className="text-xl">
-                    {foods.indexOf(food) + 1}
+                    {foods.indexOf(item) + 1}
                   </TableCell>
                   <TableCell className="text-xl">
                     <div
@@ -283,13 +315,13 @@ export default function FoodTable() {
                           "cubic-bezier(0.33, 1.52, 0.6, 1)",
                       }}
                     >
-                      {food.gambar ? (
+                      {item.gambar ? (
                         <Image
-                          src={renderImage(food.gambar) || "/placeholder.svg"}
-                          alt={food.nama_menu}
-                          className="w-[100%] h-[auto] overflow-hidden transition-transform duration-200 object-contain cursor-pointer hover:scale-110 max-w-44 outline-4 outline-black outline-none outline-offset-0"
+                          src={renderImage(item.gambar) || "/placeholder.svg"}
+                          alt={item.nama_menu}
+                          className="w-[100%] h-[auto] overflow-hidden transition-transform duration-200 object-contain cursor-pointer hover:scale-110 max-w-44 outline-4 outline-black outline dark:outline-none outline-offset-0"
                           onClick={() =>
-                            handleImageClick(renderImage(food.gambar) || "")
+                            handleImageClick(renderImage(item.gambar) || "")
                           }
                           width={0} // Ensure to set a width
                           height={0} // Ensure to set a height
@@ -301,16 +333,16 @@ export default function FoodTable() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-xl">{food.nama_menu}</TableCell>
-                  <TableCell className="text-xl">{food.jenis}</TableCell>
+                  <TableCell className="text-xl">{item.nama_menu}</TableCell>
+                  <TableCell className="text-xl">{item.jenis}</TableCell>
                   <TableCell className="w-auto text-xl max-w-72">
-                    {food.deskripsi || "N/A"}
+                    {item.deskripsi || "N/A"}
                   </TableCell>
                   <TableCell className="text-xl">
-                    {formatToRupiah(food.harga)}
+                    {formatToRupiah(item.harga)}
                   </TableCell>
                   <TableCell>
-                    <EditMenu refreshMenus={refreshMenu} menu={food} />
+                    <EditMenu refreshMenus={refreshMenu} menu={item} />
                     <Spacer y={5} />
                     <Button
                       className="text-lg hover:scale-110 bg-danger-500"
@@ -319,23 +351,17 @@ export default function FoodTable() {
                           "cubic-bezier(0.33, 1.52, 0.6, 1)",
                       }}
                       size="lg"
-                      onClick={() => handleDelete(food.id_menu)}
+                      onClick={() => handleDelete(item.id_menu)}
                     >
                       Delete Menu Button
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
-
           </Table>
 
-          <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            size="xl"
-            backdrop="blur"
-          >
+          <Modal isOpen={isOpen} onClose={onClose} size="xl" backdrop="blur">
             <ModalContent>
               <ModalHeader className="flex flex-col gap-1">
                 Food Image

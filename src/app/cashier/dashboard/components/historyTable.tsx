@@ -23,42 +23,8 @@ import {
   SelectItem,
   Spacer,
 } from "@nextui-org/react";
-import jsPDF from "jspdf";
-export interface User {
-  id_user: number;
-  nama_user: string;
-  password: string;
-  role: string;
-  username: string;
-}
-export interface Transaksi {
-  id_transaksi: number;
-  tgl_transaksi: string;
-  nama_pelanggan: string;
-  status: string;
-  total_harga: number;
-  Detail_Transaksi: Detail_Transaksi[];
-  User: User; // Add the User interface here
-}
-export interface Detail_Transaksi extends Transaksi {
-  Menu: Menu;
-  jumlah: number;
-  total_harga: number;
-}
-export interface Menu {
-  id_menu: number;
-  nama_menu: string;
-  jenis: Jenis; // Assuming `Jenis` is an enum or another type
-  deskripsi?: string;
-  gambar?: string; // Representing the LONGBLOB as a base64 string or URL if required
-  harga: number;
-  date_added: Date;
-}
-export enum Jenis {
-  FOOD = "FOOD",
-  BEVERAGE = "BEVERAGE",
-  // Add more as needed
-}
+import { Detail_Transaksi, Transaksi } from "@/lib/types";
+import { handleExportPDF } from "@/lib/utils";
 export default function HistoryTable() {
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
   const [Detailtransaksi, setDetailTransaksi] = useState<Detail_Transaksi[]>(
@@ -189,46 +155,7 @@ export default function HistoryTable() {
     setDetailTransaksi(item.Detail_Transaksi);
     onOpen();
   };
-  const handleExportPDF = (items: Detail_Transaksi[]) => {
-    const doc = new jsPDF();
-    doc.text(`Transaction ID: ${selectedTransaksi?.id_transaksi}`, 10, 10);
 
-    let y = 20;
-    items.forEach((item) => {
-      doc.text(`Menu: ${item.Menu.nama_menu}`, 10, y);
-      y += 10;
-      doc.text(`Quantity: ${item.jumlah}`, 10, y);
-      y += 10;
-      doc.text(
-        `Total Price Of ${
-          item.Menu.nama_menu
-        }: ${item.total_harga.toLocaleString("en-EN", {
-          style: "currency",
-          currency: "IDR",
-          notation: "compact",
-        })}`,
-        10,
-        y
-      );
-      y += 10;
-      doc.line(10, y, 200, y);
-      y += 10;
-    });
-    doc.text(
-      `Total Price: ${selectedTransaksi?.total_harga.toLocaleString("en-EN", {
-        style: "currency",
-        currency: "IDR",
-        notation: "compact",
-      })}`,
-      10,
-      y
-    );
-    y += 10;
-    doc.text(`Customer Name: ${selectedTransaksi?.nama_pelanggan}`, 10, y);
-    y += 10;
-    doc.text(`Cashier Name: ${selectedTransaksi?.User.nama_user}`, 10, y);
-    doc.save(`transaction_${selectedTransaksi?.id_transaksi}.pdf`);
-  };
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
@@ -430,7 +357,9 @@ export default function HistoryTable() {
                 ) : (
                   <Button
                     className="text-md bg-primary-400"
-                    onPress={() => handleExportPDF(sortedDetail)}
+                    onClick={() =>
+                      handleExportPDF(sortedDetail, selectedTransaksi!)
+                    }
                   >
                     Export
                   </Button>

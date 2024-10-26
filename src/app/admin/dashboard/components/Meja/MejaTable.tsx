@@ -13,11 +13,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import AddMeja from "./AddMeja";
 import EditMeja from "./EditMeja";
-interface Meja {
-  id_meja: number;
-  nomor_meja: string;
-}
-
+import { Meja } from "@/lib/types";
 const MejaTable = () => {
   const [meja, setMeja] = useState<Meja[]>([]);
   const [loading, setLoading] = useState(true);

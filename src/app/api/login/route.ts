@@ -45,21 +45,21 @@ export async function POST(req: NextRequest) {
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to secure only in production
-      maxAge: 24 * 60 * 60, // 24 hour
+      maxAge: 365 * 24 * 60 * 60,
       sameSite: "strict", // Protect against CSRF
       path: "/", // Ensure the cookie is available across the app
     });
     response.cookies.set("name", user.nama_user, {
       httpOnly: false, // Set to false if you want to access it on the client side
       secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60,
+      maxAge: 365 * 24 * 60 * 60,
       sameSite: "strict",
       path: "/",
     });
     response.cookies.set("username", user.username, {
       httpOnly: false, // Set to false if you want to access it on the client side
       secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60,
+      maxAge: 365 * 24 * 60 * 60,
       sameSite: "strict",
       path: "/",
     });
