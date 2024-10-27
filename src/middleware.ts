@@ -8,6 +8,18 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 type RolePaths = {
   [key in CustomJWTPayload["user"]["role"]]: string[];
 };
+export const config = {
+  matcher: [
+    "/api/admin/:path*",
+    "/api/cashier/:path*",
+    "/api/manager/:path*",
+    "/manager/:path*",
+    "/admin/:path*",
+    "/cashier/:path*",
+    "/login",
+  ],
+};
+
 export async function middleware(request: NextRequest) {
   console.log("Middleware triggered");
 
@@ -80,14 +92,3 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-export const config = {
-  matcher: [
-    "/api/admin/:path*",
-    "/api/cashier/:path*",
-    "/api/manager/:path*",
-    "/manager/:path*",
-    "/admin/:path*",
-    "/cashier/:path*",
-    "/login",
-  ],
-};

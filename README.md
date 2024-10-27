@@ -22,10 +22,11 @@ To get started with the project, follow these steps:
 ## Technologies Used
 
 - Next.js
-- React
 - Prisma
+- JWT
 - Tailwind CSS
 - NextUI
+- Shadcn
 
 ## Project Structure
 
