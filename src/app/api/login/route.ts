@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       { expiresIn: "1y" } // Token expires in 1 day
     );
     const response = NextResponse.redirect(
-      new URL(`/${user.role}/dashboard`, req.url)
+      new URL(`/${user.role.toLowerCase()}/dashboard`, req.url)
     );
     response.cookies.set("token", token, {
       httpOnly: true,

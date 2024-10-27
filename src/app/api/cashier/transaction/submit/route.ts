@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       id_user: userId,
       id_meja: idmeja,
       nama_pelanggan: customerName,
-      status: "belum_bayar",
+      status: "Unpaid",
       total_harga: total_harga,
     },
   });

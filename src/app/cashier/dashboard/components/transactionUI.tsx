@@ -214,7 +214,7 @@ export default function TransactionUI() {
   };
 
   const submitTransaction = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent page reload
+    event.preventDefault();
 
     const total_harga: number = cart.reduce(
       (sum, item) => sum + item.total_harga,

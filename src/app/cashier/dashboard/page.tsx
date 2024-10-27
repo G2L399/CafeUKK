@@ -66,7 +66,7 @@ export default function CashierDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-black">
+    (<div className="flex min-h-screen bg-black">
       {/* Fixed Sidebar */}
       <aside className=" p-6 text-default-900 bg-default-50 lg:w-64 md:w-52 w-32">
         <div className="flex flex-col h-full">
@@ -109,9 +109,9 @@ export default function CashierDashboard() {
                 Toggle theme: {theme === "light" ? "Light" : "Dark"}
               </span>
               {theme === "light" ? (
-                <Sun className=" text-white" /> // Sun icon for light mode
+                (<Sun className=" text-white" />) // Sun icon for light mode
               ) : (
-                <Moon className=" text-black" /> // Moon icon for dark mode
+                (<Moon className=" text-black" />) // Moon icon for dark mode
               )}
             </Button>
           </nav>
@@ -129,7 +129,6 @@ export default function CashierDashboard() {
           </Button>
         </div>
       </aside>
-
       {/* Main Content */}
       <main className="flex-1 px-8 py-2 bg-default-100">
         <h1 className="mb-2 text-3xl font-bold text-default-900">
@@ -140,6 +139,6 @@ export default function CashierDashboard() {
           {activeTab === "history" && <HistoryTable />}
         </div>
       </main>
-    </div>
+    </div>)
   );
 }

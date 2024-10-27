@@ -67,7 +67,7 @@ export default function HistoryTable() {
       setLoading(false);
     }
   };
-  const changestatus = async (id: number) => {
+  const changestatus = async (id: string) => {
     await axios.post("/api/cashier/transaction/changeStatus/" + id);
   };
   useEffect(() => {
@@ -266,7 +266,7 @@ export default function HistoryTable() {
                     <span className="font-bold">VIEW DETAILS</span>
                   </Button>
                   <Spacer x={5}></Spacer>
-                  {item.status.toLowerCase() === "belum_bayar" ? (
+                  {item.status.toLowerCase() === "unpaid" ? (
                     <Button
                       className="bg-default-300 "
                       size="lg"
@@ -278,7 +278,7 @@ export default function HistoryTable() {
                         );
                       }}
                     >
-                      LUNASKAN
+                      Paid
                     </Button>
                   ) : (
                     <></>

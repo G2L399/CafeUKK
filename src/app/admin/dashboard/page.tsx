@@ -156,7 +156,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-default-100">
+    (<div className="flex min-h-screen bg-default-100">
       {/* Fixed Sidebar */}
       <aside className="w-64 p-6 text-white bg-default-100">
         <div className="flex flex-col h-full">
@@ -207,9 +207,9 @@ export default function AdminDashboard() {
                 Toggle theme: {theme === "light" ? "Light" : "Dark"}
               </span>
               {theme === "light" ? (
-                <Sun className=" text-white" /> // Sun icon for light mode
+                (<Sun className=" text-white" />) // Sun icon for light mode
               ) : (
-                <Moon className=" text-black" /> // Moon icon for dark mode
+                (<Moon className=" text-black" />) // Moon icon for dark mode
               )}
             </Button>
           </nav>
@@ -227,7 +227,6 @@ export default function AdminDashboard() {
           </Button>
         </div>
       </aside>
-
       {/* Main Content */}
       <main className="flex-1 px-8 py-4 bg-default-50">
         <h1 className="mb-2 text-3xl font-bold text-default-900">
@@ -239,6 +238,6 @@ export default function AdminDashboard() {
           {activeTab === "menu" && <FoodTable />}
         </div>
       </main>
-    </div>
+    </div>)
   );
 }

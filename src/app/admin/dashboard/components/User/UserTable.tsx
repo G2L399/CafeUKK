@@ -70,7 +70,7 @@ export default function Component() {
   };
 
   const roleColor = (role: Role) => {
-    switch (role.role.toLowerCase()) {
+    switch (role.toLowerCase()) {
       case "admin":
         return "danger";
       case "manager":
@@ -139,21 +139,18 @@ export default function Component() {
               <TableCell className="w-auto max-w-10">
                 <Users
                   name={<h1 className="text-xl">{item.nama_user}</h1>}
-                  description={
-                    <span className="text-lg">ID: {item.id_user}</span>
-                  }
                   avatarProps={{
                     src: `https://api.dicebear.com/6.x/initials/svg?seed=${item.nama_user}`,
-                    style: {
-                      width: "3.5rem",
-                      height: "3.5rem",
-                    },
                   }}
                 />
+                {/* <>{item.nama_user}</> */}
               </TableCell>
               <TableCell className="w-auto max-w-10">
-                <Chip color={roleColor(item.role)} variant="dot">
-                  <h1 className="text-xl uppercase">{item.role.role}</h1>
+                <Chip
+                  color={roleColor(item.role as unknown as Role)}
+                  variant="dot"
+                >
+                  <h1 className="text-xl uppercase">{item.role}</h1>
                 </Chip>
               </TableCell>
               <TableCell className="text-xl w-auto max-w-72">

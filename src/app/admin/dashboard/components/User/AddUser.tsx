@@ -22,18 +22,15 @@ export default function AddUser({
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    nama_user: "",
-    role: "admin" || "manager" || "cashier",
-    username: "",
-    password: "",
-  });
   const initialFormData = {
     nama_user: "",
-    role: "admin", // You can change this to whichever role you'd prefer as the default
+    role: "Admin", // You can change this to whichever role you'd prefer as the default
     username: "",
     password: "",
   };
+  const [formData, setFormData] = useState({
+    ...initialFormData,
+  });
 
   const handlePasswordChange = async (
     e: React.ChangeEvent<HTMLInputElement>

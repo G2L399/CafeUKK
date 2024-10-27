@@ -201,7 +201,7 @@ export default function FoodTable() {
     return new Intl.NumberFormat("en-EN", {
       style: "currency",
       currency: "IDR",
-      notation: "scientific",
+      notation: "standard",
     }).format(value);
   }
   const sortedFood = useMemo(() => {
@@ -309,7 +309,7 @@ export default function FoodTable() {
                   </TableCell>
                   <TableCell className="text-xl">
                     <div
-                      className="flex items-center justify-center relative w-[auto] h-[auto] py-7"
+                      className=" relative w-[auto] h-[auto] py-7"
                       style={{
                         transitionTimingFunction:
                           "cubic-bezier(0.33, 1.52, 0.6, 1)",
@@ -317,7 +317,7 @@ export default function FoodTable() {
                     >
                       {item.gambar ? (
                         <Image
-                          src={renderImage(item.gambar) || "/placeholder.svg"}
+                          src={renderImage(item.gambar) || ""}
                           alt={item.nama_menu}
                           className="w-[100%] h-[auto] overflow-hidden transition-transform duration-200 object-contain cursor-pointer hover:scale-110 max-w-44 outline-4 outline-black outline dark:outline-none outline-offset-0"
                           onClick={() =>
@@ -353,7 +353,7 @@ export default function FoodTable() {
                       size="lg"
                       onClick={() => handleDelete(item.id_menu)}
                     >
-                      Delete Menu Button
+                      <span className="text-lg">Delete Menu</span>
                     </Button>
                   </TableCell>
                 </TableRow>

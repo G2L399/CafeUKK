@@ -3,41 +3,41 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Seed users
-  const user1 = await prisma.user.create({
+  await prisma.user.create({
     data: {
       nama_user: "Admin",
-      role: "admin",
+      role: "Admin",
       username: "Admin",
-      password: "$2a$10$pvFqVAagDXPHkKHfcfhBYucM/7efsDcdJ9PjmliVAHTYoFFHBHZjW",
+      password: "$2a$10$pvFqVAagDXPHkKHfcfhBYucM/7efsDcdJ9PjmliVAHTYoFFHBHZjW", // Password: Admin
     },
   });
 
-  const user2 = await prisma.user.create({
+  await prisma.user.create({
     data: {
       nama_user: "Cashier",
-      role: "cashier",
+      role: "Cashier",
       username: "Cashier",
-      password: "$2a$10$kEwhxz9Ar.KCXOaMCFtTy./FM8PtaxoD5K1OyGx81O2P6pYPseYam",
+      password: "$2a$10$kEwhxz9Ar.KCXOaMCFtTy./FM8PtaxoD5K1OyGx81O2P6pYPseYam", // Password: Cashier
     },
   });
 
-  const user3 = await prisma.user.create({
+  await prisma.user.create({
     data: {
       nama_user: "Manager",
-      role: "manager",
+      role: "Manager",
       username: "Manager",
-      password: "$2a$10$zvENvCggKZgNiOj5bq5RfOVDzPUTSBYEzF3B2p.0Y7qZfo1B8Zryi",
+      password: "$2a$10$zvENvCggKZgNiOj5bq5RfOVDzPUTSBYEzF3B2p.0Y7qZfo1B8Zryi", // Password: Manager
     },
   });
 
   // Seed tables
-  const meja1 = await prisma.meja.create({
+  await prisma.meja.create({
     data: {
       nomor_meja: "A1",
     },
   });
 
-  const meja2 = await prisma.meja.create({
+  await prisma.meja.create({
     data: {
       nomor_meja: "B1",
     },

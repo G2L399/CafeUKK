@@ -14,7 +14,7 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 import Image from "next/image";
-
+import { Jenis } from "@/lib/types";
 export default function AddMenu({
   refreshMenus,
 }: {
@@ -23,7 +23,7 @@ export default function AddMenu({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [formData, setFormData] = useState({
     nama_menu: "",
-    jenis: "Food" || "Beverage", // default value
+    jenis: Jenis.Food || Jenis.Drinks, // default value
     deskripsi: "",
     harga: 0,
   });
@@ -148,12 +148,12 @@ export default function AddMenu({
                       placeholder="Select type"
                       defaultSelectedKeys={["Food"]}
                       onSelectionChange={(key) => {
-                        const currentKey = Array.from(key)[0] as string;
+                        const currentKey = Array.from(key)[0] as Jenis;
                         setFormData({ ...formData, jenis: currentKey });
                       }}
                     >
-                      <SelectItem key="Food">Food</SelectItem>
-                      <SelectItem key="Beverage">Beverage</SelectItem>
+                      <SelectItem key="Foods">Food</SelectItem>
+                      <SelectItem key="Drinks">Drink</SelectItem>
                     </Select>
                     <Spacer y={1} />
                     <Input

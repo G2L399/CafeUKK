@@ -5,10 +5,8 @@ import { jwtVerify, JWTVerifyResult } from "jose";
 import { CustomJWTPayload } from "@/lib/types";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   console.log(params);
   const { id } = params; // Extract id from params
 
@@ -23,9 +21,9 @@ export async function DELETE(
 
     const userID = typedPayload.user.id_user;
     console.log(userID);
-    if (userID !== Number(id)) {
+    if (userID !== id) {
       const user = await prisma.user.delete({
-        where: { id_user: Number(id) },
+        where: { id_user: (id) },
       });
       return NextResponse.json({ message: "User deleted successfully", user });
     }

@@ -104,7 +104,7 @@ export default function EditMenu({
         size="lg"
         onPress={onOpen}
       >
-        Edit Menu Button
+        Edit Menu
       </Button>
       <Modal
         isOpen={isOpen}
