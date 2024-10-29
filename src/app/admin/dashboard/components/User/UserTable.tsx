@@ -69,16 +69,6 @@ export default function Component() {
     }
   };
 
-  const roleColor = (role: Role) => {
-    switch (role.role.toLowerCase()) {
-      case "admin":
-        return "danger";
-      case "manager":
-        return "success";
-      default:
-        return "default";
-    }
-  };
 
   const sortedUsers = useMemo(() => {
     return [...users].sort((a, b) => {
@@ -107,7 +97,7 @@ export default function Component() {
           <TableColumn key="id_user" allowsSorting>
             NO
           </TableColumn>
-          <TableColumn key="nama_user" allowsSorting>
+          <TableColumn key="nama_user" className="pr-14" allowsSorting>
             USER
           </TableColumn>
           <TableColumn key="role" allowsSorting>
@@ -139,23 +129,16 @@ export default function Component() {
               <TableCell className="w-auto max-w-10">
                 <Users
                   name={<h1 className="text-xl">{item.nama_user}</h1>}
-                  description={
-                    <span className="text-lg">ID: {item.id_user}</span>
-                  }
                   avatarProps={{
                     src: `https://api.dicebear.com/6.x/initials/svg?seed=${item.nama_user}`,
-                    style: {
-                      width: "3.5rem",
-                      height: "3.5rem",
-                    },
+                    // style: {
+                    //   width: "3.5rem",
+                    //   height: "3.5rem",
+                    // },
                   }}
                 />
               </TableCell>
-              <TableCell className="w-auto max-w-10">
-                <Chip color={roleColor(item.role)} variant="dot">
-                  <h1 className="text-xl uppercase">{item.role.role}</h1>
-                </Chip>
-              </TableCell>
+              <TableCell className="text-xl">{item.role}</TableCell>
               <TableCell className="text-xl w-auto max-w-72">
                 {item.username}
               </TableCell>

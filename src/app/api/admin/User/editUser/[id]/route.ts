@@ -11,7 +11,7 @@ export async function PUT(
     const { nama_user, role, username, password } = await req.json();
 
     const updatedUser = await prisma.user.update({
-      where: { id_user: Number(id) },
+      where: { id_user: id },
       data: {
         nama_user,
         role,

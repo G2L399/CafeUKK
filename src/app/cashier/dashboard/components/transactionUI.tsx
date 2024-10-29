@@ -25,7 +25,7 @@ import {
 import { Minus, Plus, Search, X } from "lucide-react";
 import React from "react";
 import Image from "next/image";
-import { Menu,Meja } from "@/lib/types";
+import { Menu, Meja } from "@/lib/types";
 interface CartItem extends Menu {
   quantity: number;
   total_harga: number;
@@ -37,7 +37,11 @@ const formatter = new Intl.NumberFormat("en-EN", {
   notation: "compact",
 });
 
-export default function TransactionUI() {
+export default function TransactionUI({
+  cashiername,
+}: {
+  cashiername: string;
+}) {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [mejas, setmejas] = useState<Meja[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -45,7 +49,7 @@ export default function TransactionUI() {
   const [CartQuery, setCartQuery] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [idmeja, setIdmeja] = useState<number>(0);
-  const [filterType, setFilterType] = useState<"All" | "Food" | "Drinks">(
+  const [filterType, setFilterType] = useState<"All" | "Foods" | "Drinks">(
     "All"
   );
 
@@ -100,7 +104,8 @@ export default function TransactionUI() {
     return [...filteredMenus].sort((a, b) => {
       let first = a[sortDescriptor.column as keyof Menu];
       let second = b[sortDescriptor.column as keyof Menu];
-      if ((first === undefined || null) && (second === undefined || null)) return 0;
+      if ((first === undefined || null) && (second === undefined || null))
+        return 0;
       if (first === undefined || null) return 1; // Treat undefined as greater than any defined value
       if (second === undefined || null) return -1; // Treat defined values as less than undefined
       if (sortDescriptor.column === "no") {
@@ -121,7 +126,7 @@ export default function TransactionUI() {
     }
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    
+
     return sortedMenu.slice(start, end);
   }, [sortedMenu, page, rowsPerPage]);
   const fetchMenus = async () => {
@@ -225,7 +230,7 @@ export default function TransactionUI() {
         .post(
           "/api/cashier/transaction/submit",
 
-          { cart, customerName, idmeja, total_harga }
+          { cart, customerName, idmeja, total_harga,cashiername }
         )
         .finally(() => {
           setCart([]);
@@ -291,7 +296,7 @@ export default function TransactionUI() {
           <Select
             value={filterType}
             onChange={(e) =>
-              setFilterType(e.target.value as "All" | "Food" | "Drinks")
+              setFilterType(e.target.value as "All" | "Foods" | "Drinks")
             }
             defaultSelectedKeys={["All"]}
             className="w-full md:w-1/4 text-default-900"
@@ -306,8 +311,8 @@ export default function TransactionUI() {
             <SelectItem key="All" value="All">
               All
             </SelectItem>
-            <SelectItem key="Food" value="Food">
-              Food
+            <SelectItem key="Foods" value="Foods">
+              Foods
             </SelectItem>
             <SelectItem key="Drinks" value="Drinks">
               Drinks
@@ -344,7 +349,7 @@ export default function TransactionUI() {
           </Select>
           <div></div>
         </div>
-        
+
         <Table
           aria-label="Menu items table"
           sortDescriptor={sortDescriptor}
@@ -356,7 +361,6 @@ export default function TransactionUI() {
             td: "text-lg text-default-900 border-b-[5px] border-divider",
             thead: "[&>tr]:first:shadow-sm",
           }}
-          
           isCompact
         >
           <TableHeader>
@@ -431,7 +435,7 @@ export default function TransactionUI() {
               transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
             }}
             onClick={() => {
-              const newCart = menus.reduce(
+              const newCart = filteredMenus.reduce(
                 (acc, menu) => {
                   const existingItem = acc.find(
                     (item) => item.id_menu === menu.id_menu
@@ -465,7 +469,7 @@ export default function TransactionUI() {
         </div>
       </div>
       <div className="w-full lg:w-4/12 text-default-900">
-      <Input
+        <Input
           type="text"
           value={CartQuery}
           onChange={(e) => setCartQuery(e.target.value)}

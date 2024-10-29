@@ -14,7 +14,7 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 import Image from "next/image";
-
+import { Jenis } from "@/lib/types";
 export default function AddMenu({
   refreshMenus,
 }: {
@@ -23,7 +23,7 @@ export default function AddMenu({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [formData, setFormData] = useState({
     nama_menu: "",
-    jenis: "Food" || "Beverage", // default value
+    jenis: Jenis.Food || Jenis.Drinks, // default value
     deskripsi: "",
     harga: 0,
   });
@@ -63,7 +63,8 @@ export default function AddMenu({
         gambar: imageBase64,
       };
       console.log("erm");
-
+      console.log(data);
+      
       await axios.post("/api/admin/Menu/addMenu", data, {
         headers: {
           "Content-Type": "application/json", // Set content type for JSON
@@ -146,14 +147,14 @@ export default function AddMenu({
                     <Select
                       label="Type"
                       placeholder="Select type"
-                      defaultSelectedKeys={["Food"]}
+                      defaultSelectedKeys={["Foods"]}
                       onSelectionChange={(key) => {
-                        const currentKey = Array.from(key)[0] as string;
+                        const currentKey = Array.from(key)[0] as unknown as Jenis;
                         setFormData({ ...formData, jenis: currentKey });
                       }}
                     >
-                      <SelectItem key="Food">Food</SelectItem>
-                      <SelectItem key="Beverage">Beverage</SelectItem>
+                      <SelectItem key="Foods">Foods</SelectItem>
+                      <SelectItem key="Drinks">Drinks</SelectItem>
                     </Select>
                     <Spacer y={1} />
                     <Input
@@ -169,6 +170,7 @@ export default function AddMenu({
                       type="number"
                       label="Price"
                       placeholder="Enter price"
+                      min={1}
                       value={formData.harga.toString()}
                       onChange={(e) =>
                         setFormData({

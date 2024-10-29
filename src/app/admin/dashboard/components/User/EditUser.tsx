@@ -68,10 +68,11 @@ export default function EditUser({
           transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
         }}
         size="lg"
+        color="primary"
         onPress={onOpen}
       >
-        <Edit />
-        <h1 className="text-xl">Edit User</h1>
+        <Edit color="white" />
+        <h1 className="text-white text-xl">Edit User</h1>
       </Button>
       <Modal
         isOpen={isOpen}
@@ -99,7 +100,7 @@ export default function EditUser({
                 <Select
                   label="Role"
                   placeholder="Select role"
-                  defaultSelectedKeys={[formData.role.role]}
+                  defaultSelectedKeys={[formData.role]}
                   onSelectionChange={(key) => {
                     console.log(key);
                     const currentKey = Array.from(key)[0] as unknown as Role; // Convert the set to array and get the first item

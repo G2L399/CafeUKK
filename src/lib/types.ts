@@ -2,7 +2,7 @@ import { JWTPayload } from "jose";
 
 export interface CustomJWTPayload extends JWTPayload {
   user: {
-    id_user: number;
+    id_user: string;
     role: "Admin" | "Cashier" | "Manager";
   };
 }
@@ -36,9 +36,9 @@ export type Menu = {
   gambar?: string; // Representing the LONGBLOB as a base64 string or URL if required
   harga: number;
   date_added: string | Date;
-}
+};
 export enum Jenis {
-  Food = "Food",
+  Food = "Foods",
   Drinks = "Drinks",
   // Add more as needed
 }
@@ -46,6 +46,4 @@ export type Meja = {
   id_meja: number;
   nomor_meja: string;
 };
-export type Role = {
-  role: "Admin" | "Cashier" | "Manager";
-};
+export type Role = "Admin" | "Cashier" | "Manager";

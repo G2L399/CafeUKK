@@ -23,9 +23,9 @@ export async function DELETE(
 
     const userID = typedPayload.user.id_user;
     console.log(userID);
-    if (userID !== Number(id)) {
+    if (userID != id) {
       const user = await prisma.user.delete({
-        where: { id_user: Number(id) },
+        where: { id_user: id },
       });
       return NextResponse.json({ message: "User deleted successfully", user });
     }

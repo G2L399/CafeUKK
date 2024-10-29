@@ -26,14 +26,15 @@ export async function middleware(request: NextRequest) {
     const { payload }: JWTVerifyResult = await jwtVerify(token, JWT_SECRET);
     const typedPayload = payload as CustomJWTPayload;
     const userRole = typedPayload.user.role;
+    const roleURL = userRole.toLowerCase();
     const pathname = request.nextUrl.pathname;
 
     console.log(`User Role: ${userRole}, Pathname: ${pathname}`);
 
     const rolePaths: RolePaths = {
-      admin: ["/api/admin", "/admin/"],
-      cashier: ["/api/cashier", "/cashier/"],
-      manager: ["/api/manager", "/manager/"],
+      Admin: ["/api/admin", "/admin/"],
+      Cashier: ["/api/cashier", "/cashier/"],
+      Manager: ["/api/manager", "/manager/"],
     };
 
     const isPathRestricted = (role: CustomJWTPayload["user"]["role"]) => {
@@ -42,26 +43,26 @@ export async function middleware(request: NextRequest) {
     if (
       pathname.startsWith("/login") &&
       Boolean(
-        userRole === "admin" || userRole === "cashier" || userRole === "manager"
+        userRole === "Admin" || userRole === "Cashier" || userRole === "Manager"
       )
     ) {
       console.log(
         "You've Already Logged In, Redirecting To Your Dashboard... [" +
-          userRole +
+          roleURL +
           "]"
       );
 
       const response = NextResponse.redirect(
-        new URL(`/${userRole}/dashboard`, request.url)
+        new URL(`/${roleURL}/dashboard`, request.url)
       );
       return response;
     }
     if (!isPathRestricted(userRole)) {
       console.log(
-        "Access denied, redirecting to your dashboard [" + userRole + "]"
+        "Access denied, redirecting to your dashboard [" + roleURL + "]"
       );
       return NextResponse.redirect(
-        new URL(`/${userRole}/dashboard`, request.url)
+        new URL(`/${roleURL}/dashboard`, request.url)
       );
     }
 

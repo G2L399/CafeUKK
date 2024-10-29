@@ -8,9 +8,9 @@ export async function POST(
   const { id } = params;
 //   const berhasil = await req.json();
   const changed = await prisma.transaksi.update({
-    where: { id_transaksi: Number(id) },
+    where: { id_transaksi: id },
     data: {
-      status: "lunas",
+      status: "Paid",
     },
   });
   return NextResponse.json({ message: "yay", changed });

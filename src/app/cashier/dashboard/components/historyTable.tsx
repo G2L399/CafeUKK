@@ -263,10 +263,10 @@ export default function HistoryTable() {
                     size="lg"
                     onClick={() => handleOpenModal(item)}
                   >
-                    <span className="font-bold">VIEW DETAILS</span>
+                    <span className="">VIEW DETAILS</span>
                   </Button>
                   <Spacer x={5}></Spacer>
-                  {item.status.toLowerCase() === "belum_bayar" ? (
+                  {item.status.toLowerCase() === "unpaid" ? (
                     <Button
                       className="bg-default-300 "
                       size="lg"
@@ -278,7 +278,7 @@ export default function HistoryTable() {
                         );
                       }}
                     >
-                      LUNASKAN
+                      Paid
                     </Button>
                   ) : (
                     <></>

@@ -12,9 +12,10 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import { EyeIcon, EyeOff } from "lucide-react";
-import axios from "axios";
+import { EyeIcon, EyeOff, UserPlus } from "lucide-react";
+import axios, { AxiosError } from "axios";
 import bcrypt from "bcryptjs";
+import { toast } from "react-hot-toast";
 export default function AddUser({
   refreshUsers,
 }: {
@@ -22,18 +23,13 @@ export default function AddUser({
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    nama_user: "",
-    role: "admin" || "manager" || "cashier",
-    username: "",
-    password: "",
-  });
   const initialFormData = {
     nama_user: "",
-    role: "admin", // You can change this to whichever role you'd prefer as the default
+    role: "Admin", // You can change this to whichever role you'd prefer as the default
     username: "",
     password: "",
   };
+  const [formData, setFormData] = useState(initialFormData);
 
   const handlePasswordChange = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -62,13 +58,22 @@ export default function AddUser({
       onOpenChange(); // Close modal
     } catch (error) {
       console.error("Failed to add user:", error);
+      if (error instanceof AxiosError && error.response?.status === 409) {
+        // Handle conflict error
+        toast.error(error.response?.data.message);
+        console.log("indian");
+        
+      } else {
+        // Handle other errors
+        toast.error("Failed to add user. Please try again later.");
+      }
     }
   };
 
   return (
     <>
       <Button
-        className="text-xl hover:scale-110"
+        className="text-white text-xl hover:scale-110"
         style={{
           transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
         }}
@@ -76,7 +81,8 @@ export default function AddUser({
         size="lg"
         onPress={onOpen}
       >
-        Add User
+        <UserPlus color="white"></UserPlus>
+        <span>Add User</span>
       </Button>
       <Modal
         isOpen={isOpen}
@@ -103,15 +109,15 @@ export default function AddUser({
                 <Select
                   label="Role"
                   placeholder="Select role"
-                  defaultSelectedKeys={["admin"]}
+                  defaultSelectedKeys={["Admin"]}
                   onSelectionChange={(key) => {
                     const currentKey = Array.from(key)[0] as string;
                     setFormData({ ...formData, role: currentKey });
                   }}
                 >
-                  <SelectItem key="admin">Admin</SelectItem>
-                  <SelectItem key="cashier">Cashier</SelectItem>
-                  <SelectItem key="manager">Manager</SelectItem>
+                  <SelectItem key="Admin">Admin</SelectItem>
+                  <SelectItem key="Cashier">Cashier</SelectItem>
+                  <SelectItem key="Manager">Manager</SelectItem>
                 </Select>
 
                 <Spacer y={1} />

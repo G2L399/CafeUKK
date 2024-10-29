@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Table,
   TableHeader,
@@ -8,15 +10,22 @@ import {
   Button,
   Spacer,
   Spinner,
+  SortDescriptor
 } from "@nextui-org/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import AddMeja from "./AddMeja";
 import EditMeja from "./EditMeja";
 import { Meja } from "@/lib/types";
+
 const MejaTable = () => {
   const [meja, setMeja] = useState<Meja[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "NO",
+    direction: "ascending"
+  });
+
   const fetchMeja = async () => {
     try {
       const response = await axios.get("/api/admin/Meja/getMeja");
@@ -27,25 +36,48 @@ const MejaTable = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchMeja();
   }, []);
 
   const handleDelete = async (id: number) => {
-    await axios.delete(`/api/admin/Meja/deleteMeja/${id}`);
-    setMeja(meja.filter((item) => item.id_meja !== id));
+    try {
+      await axios.delete(`/api/admin/Meja/deleteMeja/${id}`);
+      setMeja(meja.filter((item) => item.id_meja !== id));
+    } catch (error) {
+      console.error("Failed to delete Meja:", error);
+    }
+  };
+
+  const sortedMeja = useCallback(() => {
+    return [...meja].sort((a, b) => {
+      const first = sortDescriptor.column === "NO" ? meja.indexOf(a) : a.nomor_meja;
+      const second = sortDescriptor.column === "NO" ? meja.indexOf(b) : b.nomor_meja;
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [meja, sortDescriptor]);
+
+  const onSortChange = (descriptor: SortDescriptor) => {
+    setSortDescriptor(descriptor);
   };
 
   return (
     <div>
-      <Table aria-label="table">
-        <TableHeader aria-label="table header">
-          <TableColumn aria-label="NO">NO</TableColumn>
-          <TableColumn aria-label="NOMOR MEJA">NOMOR MEJA</TableColumn>
-          <TableColumn aria-label="ACTIONS">ACTIONS</TableColumn>
+      <Table 
+        aria-label="Meja table" 
+        sortDescriptor={sortDescriptor} 
+        onSortChange={onSortChange}
+      >
+        <TableHeader>
+          <TableColumn key="NO" allowsSorting>NO</TableColumn>
+          <TableColumn key="NOMOR_MEJA" allowsSorting>NOMOR MEJA</TableColumn>
+          <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
         <TableBody
-          aria-label="table body"
+          items={sortedMeja()}
           emptyContent={
             loading ? (
               <>
@@ -57,9 +89,9 @@ const MejaTable = () => {
             )
           }
         >
-          {meja.map((item) => (
-            <TableRow key={item.id_meja} aria-label="table row">
-              <TableCell aria-label="NO" className="text-xl">
+          {(item) => (
+            <TableRow key={item.id_meja}>
+              <TableCell className="text-xl">
                 {meja.indexOf(item) + 1}
               </TableCell>
               <TableCell
@@ -67,12 +99,11 @@ const MejaTable = () => {
                   wordBreak: "break-all",
                   whiteSpace: "normal",
                 }}
-                aria-label="NOMOR MEJA"
                 className="text-xl w-auto max-w-72"
               >
                 {item.nomor_meja}
               </TableCell>
-              <TableCell aria-label="DELETE" className="flex text-xl">
+              <TableCell className="flex text-xl">
                 <EditMeja Meja={item} refreshMeja={fetchMeja} />
                 <Spacer x={5} />
                 <Button
@@ -89,12 +120,12 @@ const MejaTable = () => {
                 </Button>
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
       <Spacer y={5} />
       <AddMeja refreshMeja={fetchMeja} />
-      <Spacer y={5}></Spacer>
+      <Spacer y={5} />
     </div>
   );
 };

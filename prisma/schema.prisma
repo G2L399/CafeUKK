@@ -42,24 +42,25 @@ model Meja {
 model Transaksi {
   id_transaksi     String             @id @default(uuid())
   tgl_transaksi    DateTime           @default(now())
-  id_user          String
-  id_meja          Int
+  id_user          String?
+  id_meja          Int?
+  cashiername      String
   nama_pelanggan   String
   status           Status
   total_harga      Int
-  User             User               @relation(fields: [id_user], references: [id_user])
-  Meja             Meja               @relation(fields: [id_meja], references: [id_meja])
+  User             User?              @relation(fields: [id_user], references: [id_user])
+  Meja             Meja?              @relation(fields: [id_meja], references: [id_meja], onDelete: NoAction, onUpdate: NoAction)
   Detail_Transaksi Detail_Transaksi[]
 }
 
 model Detail_Transaksi {
   id_detail_transaksi String    @id @default(uuid())
   id_transaksi        String
-  id_menu             Int
+  id_menu             Int?
   jumlah              Int
   total_harga         Int
   Transaksi           Transaksi @relation(fields: [id_transaksi], references: [id_transaksi])
-  Menu                Menu      @relation(fields: [id_menu], references: [id_menu])
+  Menu                Menu?     @relation(fields: [id_menu], references: [id_menu])
 }
 
 enum Role {

@@ -6,7 +6,7 @@ async function main() {
   const user1 = await prisma.user.create({
     data: {
       nama_user: "Admin",
-      role: "admin",
+      role: "Admin",
       username: "Admin",
       password: "$2a$10$pvFqVAagDXPHkKHfcfhBYucM/7efsDcdJ9PjmliVAHTYoFFHBHZjW",
     },
@@ -15,7 +15,7 @@ async function main() {
   const user2 = await prisma.user.create({
     data: {
       nama_user: "Cashier",
-      role: "cashier",
+      role: "Cashier",
       username: "Cashier",
       password: "$2a$10$kEwhxz9Ar.KCXOaMCFtTy./FM8PtaxoD5K1OyGx81O2P6pYPseYam",
     },
@@ -24,7 +24,7 @@ async function main() {
   const user3 = await prisma.user.create({
     data: {
       nama_user: "Manager",
-      role: "manager",
+      role: "Manager",
       username: "Manager",
       password: "$2a$10$zvENvCggKZgNiOj5bq5RfOVDzPUTSBYEzF3B2p.0Y7qZfo1B8Zryi",
     },
