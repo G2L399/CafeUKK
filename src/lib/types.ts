@@ -18,6 +18,7 @@ export type Transaksi = {
   id_transaksi: number;
   tgl_transaksi: string;
   nama_pelanggan: string;
+  cashiername: string;
   status: string;
   total_harga: number;
   Detail_Transaksi: Detail_Transaksi[];

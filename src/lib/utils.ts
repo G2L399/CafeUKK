@@ -96,7 +96,7 @@ export const handleExportPDF = (
         margin: [0, 10, 0, 2],
       },
       {
-        text: `Cashier Name: ${selectedTransaksi?.User?.nama_user}`,
+        text: `Cashier Name: ${selectedTransaksi?.cashiername}`,
         margin: [0, 2, 0, 20],
       },
 

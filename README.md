@@ -7,9 +7,12 @@ This is a Next.js project for managing a cafe. It includes features such as menu
 To get started with the project, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/G2L399/cafeukk.git`
-2. Install dependencies: `npm install` or `yarn install`
-3. Start the development server: `npm run dev` or `yarn dev`
-4. Open the application in your browser: `http://localhost:3000`
+2. Make a .env File with `DATABASE_URL="mysql://root@localhost:3306/{your-database-name}"
+JWT_SECRET="Secret"`
+3. Install dependencies: `npm install` or `yarn install`
+4. Migrate Database: `npx prisma generate` then `npx prisma migrate dev`
+5. Start the development server: `npm run dev` or `yarn dev`
+6. Open the application in your browser: `http://localhost:3000`
 
 ## Features
 

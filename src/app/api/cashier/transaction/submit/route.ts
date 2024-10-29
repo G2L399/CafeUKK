@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const { idmeja } = body;
 
   const { cashiername } = body;
-  console.log(cashiername);
+  console.log("name:",cashiername);
 
   // Validate the request body
   if (!cart || !customerName || !idmeja || !total_harga) {

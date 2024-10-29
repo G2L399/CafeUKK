@@ -87,8 +87,8 @@ export default function TransactionUI({
   useEffect(() => {
     fetchMenus();
     fetchMeja();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    console.log(cashiername);
+  }, [cashiername]);
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -221,6 +221,8 @@ export default function TransactionUI({
   const submitTransaction = async (event: React.FormEvent) => {
     event.preventDefault(); // Prevent page reload
 
+    console.log(cashiername);
+    
     const total_harga: number = cart.reduce(
       (sum, item) => sum + item.total_harga,
       0
