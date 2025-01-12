@@ -263,7 +263,7 @@ export default function HistoryTable() {
                     size="lg"
                     onClick={() => handleOpenModal(item)}
                   >
-                    <span className="font-bold">VIEW DETAILS</span>
+                    <span className="">VIEW DETAILS</span>
                   </Button>
                   <Spacer x={5}></Spacer>
                   {item.status.toLowerCase() === "unpaid" ? (

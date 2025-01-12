@@ -83,7 +83,6 @@ export default function TransactionUI() {
   useEffect(() => {
     fetchMenus();
     fetchMeja();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

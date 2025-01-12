@@ -32,7 +32,7 @@ export const handleExportPDF = (
             // Table header
             [
               { text: "Item", style: "tableHeader" },
-              { text: "Qty", style: "tableHeader", alignment: "center" },
+              { text: "Quantity", style: "tableHeader", alignment: "center" },
               { text: "Price", style: "tableHeader", alignment: "right" },
               { text: "Total", style: "tableHeader", alignment: "right" },
             ],
@@ -96,7 +96,7 @@ export const handleExportPDF = (
         margin: [0, 10, 0, 2],
       },
       {
-        text: `Cashier: ${selectedTransaksi?.User.nama_user}`,
+        text: `Cashier Name: ${selectedTransaksi?.User.nama_user}`,
         margin: [0, 2, 0, 20],
       },
 

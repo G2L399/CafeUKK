@@ -98,9 +98,9 @@
 import { useEffect, useState } from "react";
 import { Button, Image } from "@nextui-org/react";
 import { Users, CoffeeIcon, Menu, LogOut, Sun, Moon } from "lucide-react";
-import UserTable from "./components/User/UserTable";
-import MejaTable from "./components/Meja/MejaTable";
-import FoodTable from "./components/Menu/MenuTable";
+import UserTable from "../components/User/UserTable";
+import MejaTable from "../components/Meja/MejaTable";
+import FoodTable from "../components/Menu/MenuTable";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useTheme } from "next-themes";

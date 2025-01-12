@@ -12,7 +12,7 @@ import { useTheme } from "next-themes";
 import "@/app/globals.css";
 type TabKey = "transaction" | "history";
 
-export default function CashierDashboard() {
+export function CashierDashboard() {
   const [activeTab, setActiveTab] = useState<TabKey>("transaction");
   const [CashierName, setCashierName] = useState<string>(""); // state to hold cashier name
   const [userName, setuserName] = useState<string>(""); // state to hold cashier name
@@ -66,7 +66,7 @@ export default function CashierDashboard() {
   ];
 
   return (
-    (<div className="flex min-h-screen bg-black">
+    <div className="flex min-h-screen bg-black">
       {/* Fixed Sidebar */}
       <aside className=" p-6 text-default-900 bg-default-50 lg:w-64 md:w-52 w-32">
         <div className="flex flex-col h-full">
@@ -109,9 +109,9 @@ export default function CashierDashboard() {
                 Toggle theme: {theme === "light" ? "Light" : "Dark"}
               </span>
               {theme === "light" ? (
-                (<Sun className=" text-white" />) // Sun icon for light mode
+                <Sun className=" text-white" /> // Sun icon for light mode
               ) : (
-                (<Moon className=" text-black" />) // Moon icon for dark mode
+                <Moon className=" text-black" /> // Moon icon for dark mode
               )}
             </Button>
           </nav>
@@ -139,6 +139,6 @@ export default function CashierDashboard() {
           {activeTab === "history" && <HistoryTable />}
         </div>
       </main>
-    </div>)
+    </div>
   );
 }

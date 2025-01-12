@@ -12,13 +12,14 @@ import {
 } from "@nextui-org/react";
 import axios, { AxiosError } from "axios";
 import { EyeIcon, EyeOff, LogInIcon } from "lucide-react";
-const LoginPage = () => {
+export default function Login() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
   const [isVisible, setIsVisible] = useState(false);
-
+  console.log("Triggered");
+  
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,4 +127,3 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
