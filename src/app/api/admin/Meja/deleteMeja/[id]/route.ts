@@ -4,7 +4,8 @@ import prisma from "@/lib/prisma";
 export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const { id } = params;
-
+  console.log(id);
+  
   try {
     const deletedMeja = await prisma.meja.delete({
       where: { id_meja: Number(id) },

@@ -48,6 +48,7 @@ export function CashierDashboard() {
     if (username) {
       setuserName(username);
     }
+    localStorage.setItem("theme", theme || "light");
     console.log(`Cashier name: ${name}`);
   }, []);
 
@@ -135,7 +136,7 @@ export function CashierDashboard() {
           Cashier Dashboard
         </h1>
         <div className=" p-6 rounded-lg shadow bg-default-200">
-          {activeTab === "transaction" && <TransactionUI />}
+          {activeTab === "transaction" && <TransactionUI cashiername={CashierName} />}
           {activeTab === "history" && <HistoryTable />}
         </div>
       </main>

@@ -13,6 +13,9 @@ export async function POST(req: NextRequest) {
 
   const { idmeja } = body;
 
+  const { cashiername } = body;
+  console.log("name:",cashiername);
+
   // Validate the request body
   if (!cart || !customerName || !idmeja || !total_harga) {
     return NextResponse.json(
@@ -44,6 +47,7 @@ export async function POST(req: NextRequest) {
   const transaction = await prisma.transaksi.create({
     data: {
       tgl_transaksi: new Date(),
+      cashiername: cashiername,
       id_user: userId,
       id_meja: idmeja,
       nama_pelanggan: customerName,

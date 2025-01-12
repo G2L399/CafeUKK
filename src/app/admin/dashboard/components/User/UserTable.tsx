@@ -107,7 +107,7 @@ export default function Component() {
           <TableColumn key="id_user" allowsSorting>
             NO
           </TableColumn>
-          <TableColumn key="nama_user" allowsSorting>
+          <TableColumn key="nama_user" className="pr-14" allowsSorting>
             USER
           </TableColumn>
           <TableColumn key="role" allowsSorting>

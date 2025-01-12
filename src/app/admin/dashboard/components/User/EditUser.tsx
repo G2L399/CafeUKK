@@ -68,10 +68,11 @@ export default function EditUser({
           transitionTimingFunction: "cubic-bezier(0.33, 1.52, 0.6, 1)",
         }}
         size="lg"
+        color="primary"
         onPress={onOpen}
       >
-        <Edit />
-        <h1 className="text-xl">Edit User</h1>
+        <Edit color="white" />
+        <h1 className="text-white text-xl">Edit User</h1>
       </Button>
       <Modal
         isOpen={isOpen}

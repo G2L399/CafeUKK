@@ -108,7 +108,7 @@ import { useTheme } from "next-themes";
 type TabKey = "users" | "meja" | "menu";
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<TabKey>("menu");
+  const [activeTab, setActiveTab] = useState<TabKey>("users");
   const [adminName, setAdminName] = useState<string>(""); // state to hold admin name
   const [userName, setuserName] = useState<string>(""); // state to hold admin name
   const [mounted, setMounted] = useState(false);
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
               height={50}
             />
             <div>
-              <h1 className="text-xl font-bold text-default-900">
+              <h1 className="text-xl outline-black font-bold text-default-900">
                 {adminName}
               </h1>
               <p className="text-sm font-bold text-default-900">{userName}</p>

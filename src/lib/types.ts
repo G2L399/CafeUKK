@@ -18,6 +18,7 @@ export type Transaksi = {
   id_transaksi: string;
   tgl_transaksi: string;
   nama_pelanggan: string;
+  cashiername: string;
   status: string;
   total_harga: number;
   Detail_Transaksi: Detail_Transaksi[];
@@ -38,7 +39,7 @@ export type Menu = {
   date_added: string | Date;
 };
 export enum Jenis {
-  Food = "Food",
+  Food = "Foods",
   Drinks = "Drinks",
   // Add more as needed
 }
