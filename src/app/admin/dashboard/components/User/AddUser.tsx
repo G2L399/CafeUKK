@@ -26,7 +26,6 @@ export default function AddUser({
   const initialFormData = {
     nama_user: "",
     role: "Admin", // You can change this to whichever role you'd prefer as the default
-    role: "Admin", // You can change this to whichever role you'd prefer as the default
     username: "",
     password: "",
   };

@@ -15,7 +15,6 @@ import {
 import axios from "axios";
 import Image from "next/image";
 import { Jenis } from "@/lib/types";
-import { Jenis } from "@/lib/types";
 export default function AddMenu({
   refreshMenus,
 }: {
@@ -24,7 +23,6 @@ export default function AddMenu({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [formData, setFormData] = useState({
     nama_menu: "",
-    jenis: Jenis.Food || Jenis.Drinks, // default value
     jenis: Jenis.Food || Jenis.Drinks, // default value
     deskripsi: "",
     harga: 0,
